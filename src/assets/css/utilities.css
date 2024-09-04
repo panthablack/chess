@@ -1,0 +1,3 @@
+.clickable {
+  @apply cursor-pointer;
+}
