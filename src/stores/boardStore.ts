@@ -15,7 +15,8 @@ export const useBoardStore = defineStore('boardStore', () => {
     const numRows = options?.rows || 8
     const numCols = options?.cols || 8
     const newRows = []
-    for (let i = 0; i < numRows; i++) newRows.push(rowStore.makeNewRow({ cols: numCols }))
+    for (let i = 0; i < numRows; i++)
+      newRows.push(rowStore.makeNewRow({ cols: numCols, position: i }))
 
     const board: Board = {
       rows: newRows,

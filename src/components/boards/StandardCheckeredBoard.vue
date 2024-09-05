@@ -1,12 +1,16 @@
 <template>
   <div
-    class="standardCheckeredBoardContainer flex justify-center items-center p-12 border-2 m-12 basis-full flex-wrap"
+    class="standardCheckeredBoardContainer flex justify-center items-center p-12 m-12 gap-0 flex-nowrap flex-shrink flex-grow-0"
   >
-    <Row
-      v-for="row in props.board.rows"
-      :key="'row' + row.id"
-      :row="row"
-    />
+    <div
+      class="boardWrapper shadow-lg flex flex-initial text-center justify-center items-center p-0 m-0 gap-0 flex-wrap flex-col"
+    >
+      <Row
+        v-for="row in props.board.rows"
+        :key="'row' + row.id"
+        :row="row"
+      />
+    </div>
   </div>
 </template>
 

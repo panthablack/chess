@@ -1,12 +1,10 @@
 <template>
-  <div class="rowContainer flex basis-full gap-0 items-center justify-center flex-nowrap">
+  <div class="rowContainer flex gap-0 items-center justify-center flex-nowrap">
     <Tile
       v-for="tile in props.row.tiles"
       :key="'tile' + tile"
       :tile="tile"
-    >
-      {{ tile.value }}
-    </Tile>
+    />
   </div>
 </template>
 

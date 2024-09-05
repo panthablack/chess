@@ -10,14 +10,15 @@ export const useRowStore = defineStore('rowStore', () => {
 
   const rows: Ref<Record<number, Row>> = ref({})
 
-  const makeNewRow = (options?: NewRowOptions, overrides?: Object): Row => {
+  const makeNewRow = (options: NewRowOptions): Row => {
     const numCols = options?.cols || 8
 
     const newTiles = []
-    for (let i = 0; i < numCols; i++) newTiles.push(tileStore.makeNewTile())
+    for (let i = 0; i < numCols; i++)
+      newTiles.push(tileStore.makeNewTile({ position: [options.position, i] }))
     const newRow = {
       tiles: newTiles,
-      ...(overrides || {}),
+      ...options,
       // keep id last to prevent id being set manually
       id: getNextFreeNumericalKey(rows.value),
     }
