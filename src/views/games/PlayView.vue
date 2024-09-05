@@ -12,7 +12,10 @@
           {{ gameStore.currentGame.player2.name }}
         </div>
       </div>
-      <ChessBoard />
+      <div class="boardContainer">
+        <ChessBoard v-if="gameStore.currentGame.mode === GAME_MODES.CHESS" />
+        <DraughtsBoard v-if="gameStore.currentGame.mode === GAME_MODES.DRAUGHTS" />
+      </div>
       <div class="actionsContainer my-8 flex items-center justify-end">
         <QuitGameForm />
       </div>
@@ -28,9 +31,12 @@
 </template>
 
 <script setup lang="ts">
+import ChessBoard from '@/components/boards/ChessBoard.vue'
+import DraughtsBoard from '@/components/boards/DraughtsBoard.vue'
 import CreateNewGameForm from '@/components/games/CreateNewGameForm.vue'
 import QuitGameForm from '@/components/games/QuitGameForm.vue'
 import PageHeading from '@/components/pages/PageHeading.vue'
+import { GAME_MODES } from '@/config/constants'
 import { useGameStore } from '@/stores/gameStore'
 
 const gameStore = useGameStore()

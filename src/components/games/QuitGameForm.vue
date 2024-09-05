@@ -35,21 +35,18 @@ import ModalBody from '@/components/modals/ModalBody.vue'
 import ModalFooter from '@/components/modals/ModalFooter.vue'
 import ModalHeading from '@/components/modals/ModalHeader.vue'
 import { useGameStore } from '@/stores/gameStore'
-import type { GameOptions } from '@/types/Game'
-import { computed, reactive, ref, type Reactive } from 'vue'
+import { computed, ref } from 'vue'
 
 const gameStore = useGameStore()
 
 const quitting = ref(false)
-
-const formValues: Reactive<GameOptions> = reactive({})
 
 const onCreateClicked = () => {
   quitting.value = true
 }
 
 const onSubmit = () => {
-  gameStore.startNewGame(formValues)
+  gameStore.quitCurrentGame()
   resetForm()
 }
 

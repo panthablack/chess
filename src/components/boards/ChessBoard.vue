@@ -1,6 +1,6 @@
 <template>
   <div class="chessBoardContainer">
-    <h1>chessBoard</h1>
+    <h1>Chess Board</h1>
   </div>
 </template>
 
