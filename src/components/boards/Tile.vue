@@ -1,9 +1,9 @@
 <template>
   <div
-    class="tileContainer clickable shadow-inner"
+    class="tileContainer shadow-inner"
     :class="getClass"
   >
-    <div class="w-full h-full flex items-center gap-0 justify-center w-">
+    <div class="tileContent w-full h-full flex items-center gap-0 justify-center">
       <slot />
     </div>
   </div>
