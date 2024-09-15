@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { TILE_COLOURS, TILE_SIZES } from '@/config/constants'
+import { TILE_COLOURS, TILE_SIZES } from '@/config/constants/boards'
 import { useTileStore } from '@/stores/tileStore'
 import type { Tile } from '@/types/Board'
 import { computed } from 'vue'

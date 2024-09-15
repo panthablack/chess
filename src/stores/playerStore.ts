@@ -1,4 +1,4 @@
-import { reactive } from 'vue'
+import { computed, reactive, type ComputedRef } from 'vue'
 import { defineStore } from 'pinia'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import type { Player, PlayerID, PlayerOptions } from '@/types/Player'
@@ -6,13 +6,22 @@ import { usePiecesStore } from './piecesStore'
 import type { GameMode } from '@/types/Game'
 import { PIECE_COLOURS } from '@/config/constants/pieces'
 import { is2PlayerGame } from '@/utilities/games'
+import { useGameStore } from './gameStore'
 
 export const usePlayerStore = defineStore('playerStore', () => {
   // store dependencies
   const piecesStore = usePiecesStore()
+  const gameStore = useGameStore()
 
+  // state
   const players: Record<PlayerID, Player> = reactive({})
 
+  // getters
+  const getCurrentPlayers: ComputedRef<Player[]> = computed(
+    () => gameStore.getCurrentGame?.players.map(p => players[p]) || []
+  )
+
+  // methods
   const getPlayerColour = (mode: GameMode, playerNumber: number) => {
     if (is2PlayerGame(mode) && playerNumber === 0) return PIECE_COLOURS.WHITE
     else if (is2PlayerGame(mode) && playerNumber === 1) return PIECE_COLOURS.BLACK
@@ -26,21 +35,22 @@ export const usePlayerStore = defineStore('playerStore', () => {
       id: getNextFreeNumericalKey(players),
     }
     players[player.id] = player
+    debugger
     return player.id
   }
 
   const generatePlayers = (mode: GameMode, numPlayers: number): PlayerID[] => {
-    const players = []
+    const newPlayers = []
     for (let i = 0; i < numPlayers; i++)
-      players.push(
+      newPlayers.push(
         makeNewPlayer({
           name: `Player ${i + 1}`,
           colour: getPlayerColour(mode, i),
           pieces: piecesStore.generateNewSetFromGameMode(mode, getPlayerColour(mode, i)),
         })
       )
-    return players
+    return newPlayers
   }
 
-  return { players, generatePlayers, makeNewPlayer }
+  return { players, generatePlayers, getCurrentPlayers, makeNewPlayer }
 })

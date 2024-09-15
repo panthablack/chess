@@ -1,7 +1,7 @@
 <template>
   <div class="dashboardViewContainer">
     <PageHeading>Dashboard</PageHeading>
-    <QuitGameForm v-if="gameStore.currentGame" />
+    <QuitGameForm v-if="gameStore.getCurrentGame" />
     <CreateNewGameForm v-else />
   </div>
 </template>
