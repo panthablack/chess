@@ -1,24 +1,49 @@
 import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Game, GameOptions } from '@/types/Game'
-import { DEFAULT_NEW_GAME_OPTIONS } from '@/config/constants'
+import type { Game, GameMode, GameOptions } from '@/types/Game'
+import { GAME_MODES } from '@/config/constants/games'
 import { cloneDeep } from 'lodash'
+import type { PlayerID } from '@/types/Player'
+import type { BoardID } from '@/types/Board'
+import { useBoardStore } from './boardStore'
+import type { PieceID } from '@/types/Piece'
+import { usePlayerStore } from './playerStore'
 
 export const useGameStore = defineStore('gameStore', () => {
+  // store dependencies
+  const boardStore = useBoardStore()
+  const playerStore = usePlayerStore()
+
   const previousGames: Ref<Game[]> = ref([])
   const currentGame: Ref<Game | null> = ref(null)
 
-  const quitCurrentGame = (): void => {
+  const endCurrentGame = (): void => {
     const clonedGame = cloneDeep(currentGame.value)
     if (clonedGame) previousGames.value.push(clonedGame)
     currentGame.value = null
   }
 
-  const startNewGame = (options: GameOptions): Game => {
-    const game = { ...DEFAULT_NEW_GAME_OPTIONS, ...options }
+  const quitCurrentGame = (): void => endCurrentGame()
+
+  const startNewGame = (options: GameOptions = {}): Game => {
+    const mode: GameMode = options.mode || GAME_MODES.CHESS
+    const numPlayers = options.numPlayers || 2
+
+    // generate new players
+    const players: PlayerID[] = playerStore.generatePlayers(mode, numPlayers)
+
+    // generate new board
+    const boardID: BoardID = boardStore.makeNewBoard()
+
+    // generate positions matrix based on board (matrix/array structure) and piece ids (contents, e.
+    // g., id or null)
+    const positions: PieceID[][] = []
+
+    // create a new Game and return
+    const game: Game = { board: boardID, mode, players, positions }
     currentGame.value = game
     return game
   }
 
-  return { currentGame, previousGames, quitCurrentGame, startNewGame }
+  return { currentGame, endCurrentGame, previousGames, quitCurrentGame, startNewGame }
 })
