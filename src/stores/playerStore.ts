@@ -35,7 +35,6 @@ export const usePlayerStore = defineStore('playerStore', () => {
       id: getNextFreeNumericalKey(players),
     }
     players[player.id] = player
-    debugger
     return player.id
   }
 

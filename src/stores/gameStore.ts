@@ -49,8 +49,8 @@ export const useGameStore = defineStore('gameStore', () => {
     // create a new Game and return
     const id = getNextFreeNumericalKey(games)
     const game: Game = { id, board: boardID, mode, players, positions }
+    games[id] = game
     currentGame.value = id
-    debugger
     return game
   }
 
