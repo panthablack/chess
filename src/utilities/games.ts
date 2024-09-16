@@ -2,7 +2,6 @@ import { GAME_MODES } from '@/config/constants/games'
 import type { GameMode, PiecePositionMap } from '@/types/Game'
 import type { Tile, TilePosition } from '@/types/Board'
 import type { Piece, PieceID, PieceType } from '@/types/Piece'
-import { removeIfMatched } from '@/utilities/arrays'
 import { getTileByPosition } from '@/utilities/tiles'
 
 export const twoPlayerGames = [GAME_MODES.CHESS, GAME_MODES.DRAUGHTS]
