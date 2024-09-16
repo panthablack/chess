@@ -15,7 +15,10 @@
       </div>
       <div class="boardContainer">
         <ChessBoard v-if="gameStore.getCurrentGame.mode === GAME_MODES.CHESS" />
-        <DraughtsBoard v-if="gameStore.getCurrentGame.mode === GAME_MODES.DRAUGHTS" />
+        <DraughtsBoard
+          v-if="gameStore.getCurrentGame.mode === GAME_MODES.DRAUGHTS"
+          :boardID="gameStore.getCurrentGame.board"
+        />
       </div>
       <div class="actionsContainer my-8 flex items-center justify-end">
         <QuitGameForm />
@@ -40,7 +43,12 @@ import PageHeading from '@/components/pages/PageHeading.vue'
 import { GAME_MODES } from '@/config/constants/games'
 import { useGameStore } from '@/stores/gameStore'
 import { usePlayerStore } from '@/stores/playerStore'
+import { onMounted } from 'vue'
 
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
+
+// TODO: IMPORTANT!!!! REMOVE WHEN INITIAL DEVELOPMENT COMPLETE!!! // ********************
+onMounted(() => gameStore.startNewGame())
+// TODO: IMPORTANT!!!! REMOVE WHEN INITIAL DEVELOPMENT COMPLETE!!! // ********************
 </script>

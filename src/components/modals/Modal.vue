@@ -2,7 +2,7 @@
   <div class="modalWrapper">
     <div
       @mousedown="onOverlayClicked"
-      class="modalOverlay absolute top-0 left-0 z-50 h-full w-full bg-opacity-70 bg-slate-700"
+      class="modalOverlay fixed top-0 left-0 z-50 h-full w-full bg-opacity-70 bg-slate-700"
       v-if="props.modelValue"
     >
       <div class="modalContainer flex justify-center items-center h-full w-full">

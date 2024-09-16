@@ -20,12 +20,14 @@ export const usePiecesStore = defineStore('piecesStore', () => {
   const sets: Record<number, PieceSet> = reactive({})
   const pieces: Record<number, Piece> = reactive({})
 
+  const getSetPieces = (setID: PieceSetID): Piece[] => sets[setID].pieces.map(p => pieces[p])
+
   const generateStartingPieces = (pieceTypes: PieceType[], colour: PieceColour): PieceID[] => {
     const pieceIDs: PieceID[] = []
     pieceTypes.forEach(p => {
       const id = getNextFreeNumericalKey(pieces)
       pieceIDs.push(id)
-      pieces[id] = { id, colour, type: p }
+      pieces[id] = { id, colour, inPlay: true, type: p }
     })
     return pieceIDs
   }
@@ -56,5 +58,5 @@ export const usePiecesStore = defineStore('piecesStore', () => {
     else return generateNewChessPieceSet(colour)
   }
 
-  return { generateNewSetFromGameMode, sets }
+  return { generateNewSetFromGameMode, pieces, sets, getSetPieces }
 })

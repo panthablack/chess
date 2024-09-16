@@ -11,7 +11,8 @@ export type ChessPieceType = (typeof CHESS_PIECES)[keyof typeof CHESS_PIECES]
 export type ChessPiece = {
   id: PieceID
   colour: PieceColour
-  type?: ChessPieceType
+  inPlay: boolean
+  type: ChessPieceType
 }
 
 export type ChessPieceSet = {

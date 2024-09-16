@@ -46,7 +46,7 @@ const onCreateClicked = () => {
 }
 
 const onSubmit = () => {
-  gameStore.quitCurrentGame()
+  gameStore.endCurrentGame()
   resetForm()
 }
 

@@ -1,12 +1,12 @@
-import { ref, type Ref } from 'vue'
+import { reactive, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { BOARD_TYPES, TILE_COLOURS, TILE_SIZES, TILE_TYPES } from '@/config/constants/boards'
-import type { Board, NewTileOptions, Tile, TileColour, TileSize } from '@/types/Board'
+import type { Board, NewTileOptions, Tile, TileColour, TileID, TileSize } from '@/types/Board'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { isEven, isOdd } from '@/utilities/numbers'
 
 export const useTileStore = defineStore('tileStore', () => {
-  const tiles: Ref<Record<number, Tile>> = ref({})
+  const tiles: Record<number, Tile> = reactive({})
 
   const tileSize: Ref<TileSize> = ref(TILE_SIZES.MEDIUM)
 
@@ -20,14 +20,17 @@ export const useTileStore = defineStore('tileStore', () => {
     } else return TILE_COLOURS.UNKNOWN
   }
 
-  const makeNewTile = (board: Board, options: NewTileOptions): Tile => ({
-    colour: getTileColour(board, options),
-    type: TILE_TYPES.TEXT,
-    value: 'X',
-    ...options,
-    // keep id last to prevent id being set manually
-    id: getNextFreeNumericalKey(tiles.value),
-  })
+  const makeNewTile = (board: Board, options: NewTileOptions): TileID => {
+    const tile: Tile = {
+      colour: getTileColour(board, options),
+      type: TILE_TYPES.TEXT,
+      ...options,
+      // keep id last to prevent id being set manually
+      id: getNextFreeNumericalKey(tiles),
+    }
+    tiles[tile.id] = tile
+    return tile.id
+  }
 
   return { makeNewTile, tiles, tileSize }
 })

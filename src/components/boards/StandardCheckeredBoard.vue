@@ -6,7 +6,7 @@
       class="boardWrapper shadow-lg flex flex-initial text-center justify-center items-center p-0 m-0 gap-0 flex-wrap flex-col"
     >
       <Row
-        v-for="row in props.board.rows"
+        v-for="row in rows"
         :key="'row' + row.id"
         :row="row"
       />
@@ -16,9 +16,14 @@
 
 <script setup lang="ts">
 import Row from '@/components/boards/Row.vue'
-import type { Board } from '@/types/Board'
+import { useRowStore } from '@/stores/rowStore'
+import type { Board, Row as RowType } from '@/types/Board'
+import { computed, type ComputedRef } from 'vue'
 
 const props = defineProps<{
   board: Board
 }>()
+
+const rowStore = useRowStore()
+const rows: ComputedRef<RowType[]> = computed(() => props.board?.rows?.map(r => rowStore.rows[r])) || []
 </script>

@@ -3,7 +3,7 @@ import type { BOARD_TYPES, TILE_COLOURS, TILE_TYPES, TILE_SIZES } from '@/config
 export type Board = {
   id: BoardID
   layout: BoardLayout
-  rows: Row[]
+  rows: RowID[]
   type: (typeof BOARD_TYPES)[keyof typeof BOARD_TYPES]
 }
 
@@ -20,12 +20,12 @@ export type NewBoardOptions = {
 
 export type NewRowOptions = {
   tiles: Tile[]
-  position: number
+  position: RowPosition
 }
 
 export type NewTileOptions = {
   colour?: TileColour
-  position: [RowPosition, ColPosition]
+  position: TilePosition
   type?: (typeof TILE_TYPES)[keyof typeof TILE_TYPES]
   value?: any
 }
@@ -33,20 +33,24 @@ export type NewTileOptions = {
 export type Row = {
   id: RowID
   position: RowPosition
-  tiles: Tile[]
+  tiles: TileID[]
 }
 
 export type RowID = number
 
 export type RowPosition = number
 
-export type TileSize = (typeof TILE_SIZES)[keyof typeof TILE_SIZES]
-
-export type TileColour = (typeof TILE_COLOURS)[keyof typeof TILE_COLOURS]
-
 export type Tile = {
   id: number
   colour: TileColour
-  position: [RowPosition, ColPosition]
+  position: TilePosition
   type: (typeof TILE_TYPES)[keyof typeof TILE_TYPES]
 }
+
+export type TileColour = (typeof TILE_COLOURS)[keyof typeof TILE_COLOURS]
+
+export type TileID = number
+
+export type TilePosition = [RowPosition, ColPosition]
+
+export type TileSize = (typeof TILE_SIZES)[keyof typeof TILE_SIZES]

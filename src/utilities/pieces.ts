@@ -1,33 +1,12 @@
-import { CHESS_PIECES, DRAUGHTS_PIECES } from '@/config/constants/pieces'
+import {
+  INITIAL_PIECE_POSITIONS_FOR_CHESS,
+  INITIAL_PIECE_POSITIONS_FOR_DRAUGHTS,
+} from '@/config/constants/games'
 import type { ChessPieceType, DraughtsPieceType } from '@/types/Piece'
+import { cloneDeep, flattenDeep } from 'lodash'
 
-export const getStartingChessPieceTypes = (): ChessPieceType[] => [
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.PAWN,
-  CHESS_PIECES.ROOK,
-  CHESS_PIECES.KNIGHT,
-  CHESS_PIECES.BISHOP,
-  CHESS_PIECES.QUEEN,
-  CHESS_PIECES.KING,
-  CHESS_PIECES.BISHOP,
-  CHESS_PIECES.KNIGHT,
-  CHESS_PIECES.ROOK,
-]
+export const getStartingChessPieceTypes = (): ChessPieceType[] =>
+  flattenDeep(cloneDeep(INITIAL_PIECE_POSITIONS_FOR_CHESS.PLAYER_1)).filter(p => p !== null)
 
 export const getStartingDraughtsPieceTypes = (): DraughtsPieceType[] =>
-  [
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-    DRAUGHTS_PIECES.MAN,
-  ] as const
+  flattenDeep(cloneDeep(INITIAL_PIECE_POSITIONS_FOR_DRAUGHTS.PLAYER_1)).filter(p => p !== null)

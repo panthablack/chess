@@ -1,15 +1,27 @@
-import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { BOARD_TYPES } from '@/config/constants/boards'
-import type { Board, BoardID, NewBoardOptions } from '@/types/Board'
+import type { Board, BoardID, NewBoardOptions, Row, Tile, TileID } from '@/types/Board'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { useRowStore } from '@/stores/rowStore'
+import { useTileStore } from './tileStore'
+import { reactive } from 'vue'
 
 export const useBoardStore = defineStore('boardStore', () => {
   // store dependencies
   const rowStore = useRowStore()
+  const tileStore = useTileStore()
 
-  const boards: Ref<Record<number, Board>> = ref({})
+  const boards: Record<number, Board> = reactive({})
+
+  const getBoardTiles = (boardID: BoardID): Tile[] => {
+    const board: Board = boards[boardID]
+    const rows: Row[] = board.rows.map(r => rowStore.rows[r])
+    const tiles: Tile[] = []
+    rows.forEach((r: Row) =>
+      r.tiles.map((t: TileID): Tile => tileStore.tiles[t]).forEach((tile: Tile) => tiles.push(tile))
+    )
+    return tiles
+  }
 
   const makeNewBoard = (options?: NewBoardOptions, overrides?: Board): BoardID => {
     const board: Board = {
@@ -19,14 +31,15 @@ export const useBoardStore = defineStore('boardStore', () => {
       ...((options || {}) as NewBoardOptions),
       ...((overrides || {}) as NewBoardOptions),
       // keep id last to prevent id being set manually
-      id: getNextFreeNumericalKey(boards.value),
+      id: getNextFreeNumericalKey(boards),
     }
 
     rowStore.addRowsToBoard(board)
-    boards.value[board.id] = board
+
+    boards[board.id] = board
 
     return board.id
   }
 
-  return { boards, makeNewBoard }
+  return { boards, makeNewBoard, getBoardTiles }
 })

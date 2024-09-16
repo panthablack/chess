@@ -2,9 +2,10 @@ import type { PieceColour, PieceSetID } from './Piece'
 
 export type Player = {
   id: PlayerID
+  playerNumber: number
   name: string
   colour: PieceColour
-  pieces: PieceSetID
+  set: PieceSetID
 }
 
 export type PlayerID = number
@@ -12,5 +13,6 @@ export type PlayerID = number
 export type PlayerOptions = {
   name: string
   colour: PieceColour
-  pieces: PieceSetID
+  playerNumber: number
+  set: PieceSetID
 }

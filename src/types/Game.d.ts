@@ -1,11 +1,13 @@
 import { GAME_MODES } from '@/config/constants/games'
 import type { PlayerID } from '@/types/Player'
+import type { PieceID } from '@/types/Piece'
+import type { TileID } from '@/types/Board'
 
 export type Game = {
   id: number
   mode: GameMode
   board: BoardID
-  positions: PieceID[][]
+  positions: PiecePositionMap
   players: PlayerID[]
 }
 
@@ -17,3 +19,5 @@ export type GameOptions = {
   mode?: GameMode
   numPlayers?: number
 }
+
+export type PiecePositionMap = Record<TileID, PieceID>

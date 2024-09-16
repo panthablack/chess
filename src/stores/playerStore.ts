@@ -45,7 +45,8 @@ export const usePlayerStore = defineStore('playerStore', () => {
         makeNewPlayer({
           name: `Player ${i + 1}`,
           colour: getPlayerColour(mode, i),
-          pieces: piecesStore.generateNewSetFromGameMode(mode, getPlayerColour(mode, i)),
+          playerNumber: i + 1,
+          set: piecesStore.generateNewSetFromGameMode(mode, getPlayerColour(mode, i)),
         })
       )
     return newPlayers
