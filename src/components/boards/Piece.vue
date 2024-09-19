@@ -53,8 +53,11 @@ const getModeClass: ComputedRef<string> = computed(() => {
 })
 
 const getClass: ComputedRef<string> = computed(() => {
-  return `${getSizeClass.value} ${getColourClass.value} ${getModeClass.value}`
+  return `${getSizeClass.value} ${getColourClass.value} ${getModeClass.value} ${getSelectedClass.value}`
 })
+
+const getSelectedClass: ComputedRef<string> = computed(
+  () => pieceStore.selectedPiece === props.piece.id ? 'selected' : '')
 
 const pieceContent: ComputedRef<string> = computed(() => '')
 
@@ -65,5 +68,9 @@ const onPieceClicked = () => pieceStore.onPieceClicked(props.piece)
 <style scoped lang="css">
 .pieceContainer {
   overflow: hidden;
+}
+
+.pieceContainer.selected {
+  @apply bg-green-500 border-green-600 opacity-95;
 }
 </style>

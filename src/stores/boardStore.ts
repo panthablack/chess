@@ -11,8 +11,10 @@ export const useBoardStore = defineStore('boardStore', () => {
   const rowStore = useRowStore()
   const tileStore = useTileStore()
 
+  // state
   const boards: Record<number, Board> = reactive({})
 
+  // getters
   const getBoardTiles = (boardID: BoardID): Tile[] => {
     const board: Board = boards[boardID]
     const rows: Row[] = board.rows.map(r => rowStore.rows[r])
@@ -23,6 +25,7 @@ export const useBoardStore = defineStore('boardStore', () => {
     return tiles
   }
 
+  // methods
   const makeNewBoard = (options?: NewBoardOptions, overrides?: Board): BoardID => {
     const board: Board = {
       type: BOARD_TYPES.STANDARD_CHECKERED_BOARD,
@@ -41,5 +44,6 @@ export const useBoardStore = defineStore('boardStore', () => {
     return board.id
   }
 
+  // Return interface
   return { boards, makeNewBoard, getBoardTiles }
 })

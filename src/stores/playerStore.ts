@@ -21,6 +21,11 @@ export const usePlayerStore = defineStore('playerStore', () => {
     () => gameStore.getCurrentGame?.players.map(p => players[p]) || []
   )
 
+  const currentPlayer: ComputedRef<Player | null> = computed(() => {
+    if (!gameStore.getCurrentGame) return null
+    else return players[gameStore.getCurrentGame.currentPlayer]
+  })
+
   // methods
   const getPlayerColour = (mode: GameMode, playerNumber: number) => {
     if (is2PlayerGame(mode) && playerNumber === 0) return PIECE_COLOURS.WHITE
@@ -52,5 +57,6 @@ export const usePlayerStore = defineStore('playerStore', () => {
     return newPlayers
   }
 
-  return { players, generatePlayers, getCurrentPlayers, makeNewPlayer }
+  // Return interface
+  return { currentPlayer, players, generatePlayers, getCurrentPlayers, makeNewPlayer }
 })

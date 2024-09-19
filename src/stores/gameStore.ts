@@ -1,6 +1,6 @@
 import { computed, reactive, ref, type ComputedRef, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Game, GameID, GameMode, GameOptions, PiecePositionMap } from '@/types/Game'
+import type { Game, GameID, GameMode, GameOptions, MoveID, PiecePositionMap } from '@/types/Game'
 import { GAME_MODES } from '@/config/constants/games'
 import { cloneDeep } from 'lodash'
 import type { Player, PlayerID } from '@/types/Player'
@@ -17,18 +17,19 @@ export const useGameStore = defineStore('gameStore', () => {
   const playerStore = usePlayerStore()
 
   // state
-  const games: Record<number, Game> = reactive({})
   const currentGame: Ref<GameID | null> = ref(null)
+  const games: Record<number, Game> = reactive({})
 
   // getters
   const previousGames = computed(() =>
     Object.values(games).filter(g => g.id !== currentGame?.value)
   )
+
   const getCurrentGame: ComputedRef<Game | null> = computed(
     () => games[currentGame.value || 0] || null
   )
 
-  // actions
+  // methods
   const endCurrentGame = (): void => {
     const clonedGame = cloneDeep(games[currentGame.value !== null ? currentGame.value : 0])
     if (clonedGame) games[clonedGame.id] = clonedGame
@@ -68,9 +69,11 @@ export const useGameStore = defineStore('gameStore', () => {
     // (contents, e.g., id or null)
     const positions: PiecePositionMap = getInitialPositions(mode, players, tiles)
 
-    // create a new Game and return
+    // create a new Game
     const id = getNextFreeNumericalKey(games)
-    const game: Game = { id, board: boardID, mode, players, positions }
+    const currentPlayer = players[0]
+    const moves: MoveID[] = [] // TODO: move tracking and undo moves should be implemented later
+    const game: Game = { id, board: boardID, currentPlayer, mode, moves, players, positions }
     games[id] = game
     currentGame.value = id
 

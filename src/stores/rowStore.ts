@@ -8,8 +8,14 @@ export const useRowStore = defineStore('rowStore', () => {
   // store dependencies
   const tileStore = useTileStore()
 
+  // state
   const rows: Record<number, Row> = reactive({})
 
+  // getters
+
+  // ***
+
+  // methods
   const makeNewRow = (board: Board, position: number): RowID => {
     const row: Row = { tiles: [], id: getNextFreeNumericalKey(rows), position }
     const numCols = board.layout[1]
@@ -31,5 +37,6 @@ export const useRowStore = defineStore('rowStore', () => {
     return board
   }
 
+  // Return interface
   return { addRowsToBoard, rows, makeNewRow }
 })

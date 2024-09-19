@@ -6,10 +6,15 @@ import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { isEven, isOdd } from '@/utilities/numbers'
 
 export const useTileStore = defineStore('tileStore', () => {
-  const tiles: Record<number, Tile> = reactive({})
+  // store dependencies
 
+  // ***
+
+  // state
+  const tiles: Record<number, Tile> = reactive({})
   const tileSize: Ref<TileSize> = ref(TILE_SIZES.MEDIUM)
 
+  // getters
   const getTileColour = (board: Board, options: NewTileOptions): TileColour => {
     if (board.type === BOARD_TYPES.STANDARD_CHECKERED_BOARD) {
       const [row, col] = options.position
@@ -20,6 +25,7 @@ export const useTileStore = defineStore('tileStore', () => {
     } else return TILE_COLOURS.UNKNOWN
   }
 
+  // methods
   const makeNewTile = (board: Board, options: NewTileOptions): TileID => {
     const tile: Tile = {
       colour: getTileColour(board, options),
@@ -32,5 +38,6 @@ export const useTileStore = defineStore('tileStore', () => {
     return tile.id
   }
 
+  // Return interface
   return { makeNewTile, tiles, tileSize }
 })
