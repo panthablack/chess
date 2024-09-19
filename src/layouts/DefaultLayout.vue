@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router'
     <header class="navBarContainer">
       <NavBar />
     </header>
-    <div class="routerViewContainer p-4">
+    <div class="routerViewContainer">
       <RouterView />
     </div>
   </div>

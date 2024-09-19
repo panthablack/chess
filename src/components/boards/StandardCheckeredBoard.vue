@@ -1,6 +1,6 @@
 <template>
   <div
-    class="standardCheckeredBoardContainer flex justify-center items-center p-12 m-12 gap-0 flex-nowrap flex-shrink flex-grow-0"
+    class="standardCheckeredBoardContainer flex justify-center items-center p-0 m-0 gap-0 flex-nowrap flex-shrink flex-grow-0"
   >
     <div
       class="boardWrapper rounded-lg bg-yellow-800 border-yellow-800 border-8 shadow-lg flex flex-initial text-center justify-center items-center p-4 m-0 gap-0 flex-wrap flex-col"

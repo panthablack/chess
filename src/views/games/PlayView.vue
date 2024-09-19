@@ -4,7 +4,7 @@
       class="currentGameContainer my-4 max-w-4xl m-auto"
       v-if="gameStore.currentGame && !loading"
     >
-      <div class="playerInfoBar flex gap-4 items-center justify-between">
+      <div class="playerInfoBar flex gap-4 p-2 mb-2 items-center justify-between">
         <div
           class="playerDetailsContainer"
           v-for="player in playerStore.currentPlayers"
@@ -29,7 +29,7 @@
       v-if="loading"
     />
     <div
-      class="startNewGameContainer"
+      class="startNewGameContainer p-4"
       v-if="canStartNewGame"
     >
       <PageHeading>Start a New Game</PageHeading>
