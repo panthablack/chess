@@ -18,6 +18,9 @@ const props = defineProps<{
   row: Row
 }>()
 
+// store dependencies
 const tileStore = useTileStore()
+
+// getters
 const tiles: ComputedRef<TileType[]> = computed(() => props.row?.tiles?.map(t => tileStore.tiles[t])) || []
 </script>

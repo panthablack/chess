@@ -17,13 +17,13 @@ export const usePlayerStore = defineStore('playerStore', () => {
   const players: Record<PlayerID, Player> = reactive({})
 
   // getters
-  const getCurrentPlayers: ComputedRef<Player[]> = computed(
-    () => gameStore.getCurrentGame?.players.map(p => players[p]) || []
+  const currentPlayers: ComputedRef<Player[]> = computed(
+    () => gameStore.currentGame?.playerIDs.map(p => players[p]) || []
   )
 
   const currentPlayer: ComputedRef<Player | null> = computed(() => {
-    if (!gameStore.getCurrentGame) return null
-    else return players[gameStore.getCurrentGame.currentPlayer]
+    if (!gameStore.currentGame) return null
+    else return players[gameStore.currentGame.currentPlayerID]
   })
 
   // methods
@@ -58,5 +58,5 @@ export const usePlayerStore = defineStore('playerStore', () => {
   }
 
   // Return interface
-  return { currentPlayer, players, generatePlayers, getCurrentPlayers, makeNewPlayer }
+  return { currentPlayer, players, generatePlayers, currentPlayers, makeNewPlayer }
 })

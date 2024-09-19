@@ -2,22 +2,22 @@
   <div class="playViewViewContainer">
     <div
       class="currentGameContainer my-4 max-w-4xl m-auto"
-      v-if="gameStore.getCurrentGame && !loading"
+      v-if="gameStore.currentGame && !loading"
     >
       <div class="playerInfoBar flex gap-4 items-center justify-between">
         <div
           class="playerDetailsContainer"
-          v-for="player in playerStore.getCurrentPlayers"
+          v-for="player in playerStore.currentPlayers"
           :key="player.id"
         >
           {{ player.name }}
         </div>
       </div>
       <div class="boardContainer">
-        <ChessBoard v-if="gameStore.getCurrentGame.mode === GAME_MODES.CHESS" />
+        <ChessBoard v-if="gameStore.currentGame.mode === GAME_MODES.CHESS" />
         <DraughtsBoard
-          v-if="gameStore.getCurrentGame.mode === GAME_MODES.DRAUGHTS"
-          :boardID="gameStore.getCurrentGame.board"
+          v-if="gameStore.currentGame.mode === GAME_MODES.DRAUGHTS"
+          :boardID="gameStore.currentGame.boardID"
         />
       </div>
       <div class="actionsContainer my-8 flex items-center justify-end">

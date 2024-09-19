@@ -24,6 +24,9 @@ const props = defineProps<{
   board: Board
 }>()
 
+// store dependencies
 const rowStore = useRowStore()
+
+// getters
 const rows: ComputedRef<RowType[]> = computed(() => props.board?.rows?.map(r => rowStore.rows[r])) || []
 </script>

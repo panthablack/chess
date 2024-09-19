@@ -1,57 +1,80 @@
 import { computed, reactive, ref, type ComputedRef, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Game, GameID, GameMode, GameOptions, MoveID, PiecePositionMap } from '@/types/Game'
+import type {
+  Game,
+  GameID,
+  GameMode,
+  GameOptions,
+  MoveID,
+  PieceTilePositionMap,
+  TilePiecePositionMap,
+} from '@/types/Game'
 import { GAME_MODES } from '@/config/constants/games'
 import { cloneDeep } from 'lodash'
 import type { Player, PlayerID } from '@/types/Player'
 import type { BoardID, Tile } from '@/types/Board'
 import { useBoardStore } from './boardStore'
 import { usePlayerStore } from './playerStore'
-import { getNextFreeNumericalKey } from '@/utilities/objects'
+import { getNextFreeNumericalKey, parseIntMap, reverseObject } from '@/utilities/objects'
 import { getInitialPlayerPositionsForChess } from '@/utilities/chess'
 import { getInitialPlayerPositionsForDraughts } from '@/utilities/draughts'
+import { usePieceStore } from '@/stores/pieceStore'
+import type { Piece } from '@/types/Piece'
 
 export const useGameStore = defineStore('gameStore', () => {
   // store dependencies
   const boardStore = useBoardStore()
+  const pieceStore = usePieceStore()
   const playerStore = usePlayerStore()
 
   // state
-  const currentGame: Ref<GameID | null> = ref(null)
+  const currentGameID: Ref<GameID | null> = ref(null)
   const games: Record<number, Game> = reactive({})
 
   // getters
-  const previousGames = computed(() =>
-    Object.values(games).filter(g => g.id !== currentGame?.value)
+  const currentGame: ComputedRef<Game | null> = computed(
+    () => games[currentGameID.value || 0] || null
   )
 
-  const getCurrentGame: ComputedRef<Game | null> = computed(
-    () => games[currentGame.value || 0] || null
+  const pieceTilePositionMap: ComputedRef<PieceTilePositionMap> = computed(() => {
+    if (currentGame.value === null) return {}
+    const currentPositions: TilePiecePositionMap = currentGame.value.positions
+    const currentPieces: Piece[] = pieceStore.currentGamePieces
+    const revPos: PieceTilePositionMap = parseIntMap(reverseObject(Object.assign(currentPositions)))
+    return currentPieces.reduce((a: PieceTilePositionMap, v: Piece) => {
+      a[v.id] = revPos[v.id] || null
+      return a
+    }, {} as PieceTilePositionMap)
+  })
+
+  const previousGames: ComputedRef<Game[]> = computed(() =>
+    Object.values(games).filter(g => g.id !== currentGameID?.value)
   )
 
   // methods
   const endCurrentGame = (): void => {
-    const clonedGame = cloneDeep(games[currentGame.value !== null ? currentGame.value : 0])
-    if (clonedGame) games[clonedGame.id] = clonedGame
-    currentGame.value = null
+    if (currentGame.value === null) return
+    const clonedGame = cloneDeep(currentGame.value)
+    games[clonedGame.id] = clonedGame
+    currentGameID.value = null
   }
-
-  const setInitialChessPositions = (players: Player[], tiles: Tile[]): PiecePositionMap =>
-    getInitialPlayerPositionsForChess([players[0], players[1]], tiles)
-
-  const setInitialDraughtsPositions = (players: Player[], tiles: Tile[]): PiecePositionMap =>
-    getInitialPlayerPositionsForDraughts([players[0], players[1]], tiles)
 
   const getInitialPositions = (
     mode: GameMode,
     playerIDs: PlayerID[],
     tiles: Tile[]
-  ): PiecePositionMap => {
+  ): TilePiecePositionMap => {
     const players = playerIDs.map((p: PlayerID): Player => playerStore.players[p])
     if (mode === GAME_MODES.CHESS) return setInitialChessPositions(players, tiles)
     else if (mode === GAME_MODES.DRAUGHTS) return setInitialDraughtsPositions(players, tiles)
     else throw 'Game Mode not recognised.'
   }
+
+  const setInitialChessPositions = (players: Player[], tiles: Tile[]): TilePiecePositionMap =>
+    getInitialPlayerPositionsForChess([players[0], players[1]], tiles)
+
+  const setInitialDraughtsPositions = (players: Player[], tiles: Tile[]): TilePiecePositionMap =>
+    getInitialPlayerPositionsForDraughts([players[0], players[1]], tiles)
 
   const startNewGame = (options: GameOptions = {}): GameID => {
     // set mode and numPlayers based on options or defaults
@@ -59,7 +82,7 @@ export const useGameStore = defineStore('gameStore', () => {
     const numPlayers = options.numPlayers || 2
 
     // generate new players
-    const players: PlayerID[] = playerStore.generatePlayers(mode, numPlayers)
+    const playerIDs: PlayerID[] = playerStore.generatePlayers(mode, numPlayers)
 
     // generate new board
     const boardID: BoardID = boardStore.makeNewBoard()
@@ -67,19 +90,35 @@ export const useGameStore = defineStore('gameStore', () => {
 
     // generate positions matrix based on board (matrix/array structure) and piece ids
     // (contents, e.g., id or null)
-    const positions: PiecePositionMap = getInitialPositions(mode, players, tiles)
+    const positions: TilePiecePositionMap = getInitialPositions(mode, playerIDs, tiles)
 
     // create a new Game
     const id = getNextFreeNumericalKey(games)
-    const currentPlayer = players[0]
-    const moves: MoveID[] = [] // TODO: move tracking and undo moves should be implemented later
-    const game: Game = { id, board: boardID, currentPlayer, mode, moves, players, positions }
+    const currentPlayerID: PlayerID = playerIDs[0]
+    const moveIDs: MoveID[] = [] // TODO: move tracking and undo moves should be implemented later
+    const game: Game = {
+      id,
+      boardID: boardID,
+      currentPlayerID,
+      mode,
+      moveIDs,
+      playerIDs,
+      positions,
+    }
     games[id] = game
-    currentGame.value = id
+    currentGameID.value = id
 
     return id
   }
 
   // Return interface
-  return { currentGame, endCurrentGame, games, getCurrentGame, previousGames, startNewGame }
+  return {
+    currentGame,
+    currentGameID,
+    endCurrentGame,
+    games,
+    pieceTilePositionMap,
+    previousGames,
+    startNewGame,
+  }
 })

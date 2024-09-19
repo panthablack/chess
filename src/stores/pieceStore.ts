@@ -17,18 +17,46 @@ import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { getStartingChessPieceTypes, getStartingDraughtsPieceTypes } from '@/utilities/pieces'
 import { usePlayerStore } from '@/stores/playerStore'
 import type { Player } from '@/types/Player'
+import { useTileStore } from '@/stores/tileStore'
+import { useGameStore } from '@/stores/gameStore'
+import type { Tile, TilePosition } from '@/types/Board'
 
 export const usePieceStore = defineStore('pieceStore', () => {
   // store dependencies
+  const gameStore = useGameStore()
   const playerStore = usePlayerStore()
+  const tileStore = useTileStore()
 
   // state
   const sets: Record<number, PieceSet> = reactive({})
   const pieces: Record<number, Piece> = reactive({})
-  const selectedPiece: Ref<PieceID | null> = ref(null)
+  const selectedPieceID: Ref<PieceID | null> = ref(null)
 
   // getters
   const currentPlayer: ComputedRef<Player | null> = computed(() => playerStore.currentPlayer)
+
+  const selectedPiecePosition: ComputedRef<TilePosition | null> = computed(() => {
+    if (selectedPieceID.value === null) return null
+    const tileID = gameStore.pieceTilePositionMap[selectedPieceID.value]
+    if (tileID === null) return null
+    return tileStore.tiles[tileID]?.position || null
+  })
+
+  const selectedPiece: ComputedRef<Piece | null> = computed(() =>
+    selectedPieceID.value === null ? null : pieces[selectedPieceID.value]
+  )
+
+  const currentGamePieceIDs: ComputedRef<PieceID[]> = computed(
+    () =>
+      gameStore.currentGame?.playerIDs
+        ?.map(p => playerStore.players[p])
+        .map(p => sets[p.set])
+        .reduce((a: PieceID[], v) => a.concat(v.pieces), [] as PieceID[]) || []
+  )
+
+  const currentGamePieces: ComputedRef<Piece[]> = computed(
+    () => currentGamePieceIDs.value.map((p: PieceID) => pieces[p]) || []
+  )
 
   const currentPlayersPieces: ComputedRef<PieceID[]> = computed(() => {
     if (!currentPlayer.value) return []
@@ -38,6 +66,10 @@ export const usePieceStore = defineStore('pieceStore', () => {
   // methods
   const currentPlayerOwnsPiece = (piece: Piece): boolean =>
     currentPlayersPieces.value.indexOf(piece.id) !== -1
+
+  const deselectCurrentlyselectedPiece = (): void => {
+    selectedPieceID.value = null
+  }
 
   const getSetPieces = (setID: PieceSetID): Piece[] => sets[setID].pieces.map(p => pieces[p])
 
@@ -82,12 +114,27 @@ export const usePieceStore = defineStore('pieceStore', () => {
 
   const pieceCanMove = (piece: Piece): boolean => !!piece
 
-  const setPieceSelected = (piece: Piece) => (selectedPiece.value = piece.id)
+  const setPieceSelected = (piece: Piece) => (selectedPieceID.value = piece.id)
 
   const onPieceClicked = (piece: Piece) => {
+    const validDestinationTiles: Tile[] = tileStore.validDestinationTiles
+    if (!validDestinationTiles) {
+      //
+    }
     if (pieceCanBeSelected(piece)) setPieceSelected(piece)
   }
 
   // Return interface
-  return { generateNewSetFromGameMode, pieces, sets, getSetPieces, onPieceClicked, selectedPiece }
+  return {
+    currentGamePieces,
+    deselectCurrentlyselectedPiece,
+    generateNewSetFromGameMode,
+    pieces,
+    sets,
+    getSetPieces,
+    onPieceClicked,
+    selectedPiece,
+    selectedPieceID,
+    selectedPiecePosition,
+  }
 })

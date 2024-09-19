@@ -5,12 +5,12 @@ import type { TileID } from '@/types/Board'
 
 export type Game = {
   id: number
-  board: BoardID
-  currentPlayer: PlayerID
+  boardID: BoardID
+  currentPlayerID: PlayerID
   mode: GameMode
-  moves: MoveID[]
-  positions: PiecePositionMap
-  players: PlayerID[]
+  moveIDs: MoveID[]
+  positions: TilePiecePositionMap
+  playerIDs: PlayerID[]
 }
 
 export type GameID = number
@@ -24,6 +24,8 @@ export type GameOptions = {
 
 export type MoveID = number
 
-export type Move = [PiecePositionMap, PiecePositionMap] // Before and After, respectively
+export type Move = [TilePiecePositionMap, TilePiecePositionMap] // Before and After, respectively
 
-export type PiecePositionMap = Record<TileID, PieceID>
+export type TilePiecePositionMap = Record<TileID, PieceID | null>
+
+export type PieceTilePositionMap = Record<PieceID, TileID | null>

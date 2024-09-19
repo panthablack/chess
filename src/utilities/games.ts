@@ -1,5 +1,5 @@
 import { GAME_MODES } from '@/config/constants/games'
-import type { GameMode, PiecePositionMap } from '@/types/Game'
+import type { GameMode, TilePiecePositionMap } from '@/types/Game'
 import type { Tile, TilePosition } from '@/types/Board'
 import type { Piece, PieceID, PieceType } from '@/types/Piece'
 import { getTileByPosition } from '@/utilities/tiles'
@@ -18,7 +18,7 @@ export const splicePieceIfTypeMatched = (
 }
 
 export const setInitialPositions = (
-  ppMap: PiecePositionMap,
+  ppMap: TilePiecePositionMap,
   initialPositions: (PieceType | null)[][],
   availablePieces: Piece[],
   tiles: Tile[]

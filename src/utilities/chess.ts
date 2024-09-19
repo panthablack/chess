@@ -1,18 +1,27 @@
 import { INITIAL_PIECE_POSITIONS_FOR_CHESS as INIT_POS } from '@/config/constants/games'
 import type { Tile } from '@/types/Board'
-import type { PiecePositionMap } from '@/types/Game'
+import type { PieceTilePositionMap, TilePiecePositionMap } from '@/types/Game'
 import type { Player } from '@/types/Player'
 import { cloneDeep } from 'lodash'
 import { usePieceStore } from '@/stores/pieceStore'
 import { setInitialPositions } from '@/utilities/games'
 import type { Piece } from '@/types/Piece'
 
+export const calculatePossibleDestinationTilesForChess = (
+  piece: Piece,
+  player: Player,
+  map: PieceTilePositionMap
+): Tile[] => {
+  if (!piece || !player || !map) return []
+  else return []
+}
+
 export const getInitialPlayerPositionsForChess = (
   players: [Player, Player],
   tiles: Tile[]
-): PiecePositionMap => {
+): TilePiecePositionMap => {
   const pieceStore = usePieceStore()
-  const positions: PiecePositionMap = {}
+  const positions: TilePiecePositionMap = {}
 
   // set player 1 positions
   const player1 = players[0]

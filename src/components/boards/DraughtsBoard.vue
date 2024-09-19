@@ -13,5 +13,6 @@ const props = defineProps<{
   boardID: BoardID
 }>()
 
+// store dependencies
 const boardStore = useBoardStore()
 </script>

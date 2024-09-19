@@ -2,7 +2,7 @@
   <div
     class="pieceContainer rounded-full"
     :class="getClass"
-    @click="onPieceClicked"
+    @click.stop="onPieceClicked"
   >
     {{ pieceContent }}
   </div>
@@ -40,15 +40,15 @@ const chessPieceClasses: ComputedRef<string> = computed(() => 'drop-shadow-xl')
 
 const draughtsPieceClasses: ComputedRef<string> = computed(() => 'drop-shadow-xl border-8')
 
-const getColourClass = computed(() => {
+const getColourClass: ComputedRef<string> = computed(() => {
   if (props.piece.colour === PIECE_COLOURS.WHITE) return 'bg-amber-100 border-amber-200 text-slate-950'
   else if (props.piece.colour === PIECE_COLOURS.BLACK) return 'bg-orange-900 border-orange-950 text-white'
   else return 'bg-gray-400 text-white'
 })
 
 const getModeClass: ComputedRef<string> = computed(() => {
-  if (gameStore.getCurrentGame?.mode === GAME_MODES.CHESS) return chessPieceClasses.value
-  else if (gameStore.getCurrentGame?.mode === GAME_MODES.DRAUGHTS) return draughtsPieceClasses.value
+  if (gameStore.currentGame?.mode === GAME_MODES.CHESS) return chessPieceClasses.value
+  else if (gameStore.currentGame?.mode === GAME_MODES.DRAUGHTS) return draughtsPieceClasses.value
   else return ''
 })
 
@@ -57,7 +57,7 @@ const getClass: ComputedRef<string> = computed(() => {
 })
 
 const getSelectedClass: ComputedRef<string> = computed(
-  () => pieceStore.selectedPiece === props.piece.id ? 'selected' : '')
+  () => pieceStore.selectedPieceID === props.piece.id ? 'selected' : '')
 
 const pieceContent: ComputedRef<string> = computed(() => '')
 
