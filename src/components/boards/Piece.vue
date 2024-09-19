@@ -53,8 +53,10 @@ const getModeClass: ComputedRef<string> = computed(() => {
 })
 
 const getClass: ComputedRef<string> = computed(() => {
-  return `${getSizeClass.value} ${getColourClass.value} ${getModeClass.value} ${getSelectedClass.value}`
+  return `${getSizeClass.value} ${getColourClass.value} ${getModeClass.value} ${getSelectedClass.value} ${getCanBeSelectedClass.value}`
 })
+
+const getCanBeSelectedClass: ComputedRef<string> = computed(() => pieceStore.pieceCanBeSelected(props.piece) ? 'clickable' : '')
 
 const getSelectedClass: ComputedRef<string> = computed(
   () => pieceStore.selectedPieceID === props.piece.id ? 'selected' : '')

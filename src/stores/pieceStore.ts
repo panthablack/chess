@@ -129,12 +129,13 @@ export const usePieceStore = defineStore('pieceStore', () => {
     currentGamePieces,
     deselectCurrentlyselectedPiece,
     generateNewSetFromGameMode,
-    pieces,
-    sets,
     getSetPieces,
     onPieceClicked,
+    pieceCanBeSelected,
+    pieces,
     selectedPiece,
     selectedPieceID,
     selectedPiecePosition,
+    sets,
   }
 })
