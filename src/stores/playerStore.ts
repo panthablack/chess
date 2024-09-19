@@ -2,7 +2,7 @@ import { computed, reactive, type ComputedRef } from 'vue'
 import { defineStore } from 'pinia'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import type { Player, PlayerID, PlayerOptions } from '@/types/Player'
-import { usePiecesStore } from './piecesStore'
+import { usePieceStore } from '@/stores/pieceStore'
 import type { GameMode } from '@/types/Game'
 import { PIECE_COLOURS } from '@/config/constants/pieces'
 import { is2PlayerGame } from '@/utilities/games'
@@ -10,7 +10,7 @@ import { useGameStore } from './gameStore'
 
 export const usePlayerStore = defineStore('playerStore', () => {
   // store dependencies
-  const piecesStore = usePiecesStore()
+  const pieceStore = usePieceStore()
   const gameStore = useGameStore()
 
   // state
@@ -46,7 +46,7 @@ export const usePlayerStore = defineStore('playerStore', () => {
           name: `Player ${i + 1}`,
           colour: getPlayerColour(mode, i),
           playerNumber: i + 1,
-          set: piecesStore.generateNewSetFromGameMode(mode, getPlayerColour(mode, i)),
+          set: pieceStore.generateNewSetFromGameMode(mode, getPlayerColour(mode, i)),
         })
       )
     return newPlayers

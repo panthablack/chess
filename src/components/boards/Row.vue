@@ -2,7 +2,7 @@
   <div class="rowContainer flex gap-0 items-center justify-center flex-nowrap">
     <Tile
       v-for="tile in tiles"
-      :key="'tile' + tile"
+      :key="'tile' + tile.id"
       :tile="tile"
     />
   </div>

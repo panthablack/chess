@@ -28,7 +28,7 @@ export const useGameStore = defineStore('gameStore', () => {
     () => games[currentGame.value || 0] || null
   )
 
-  // methods
+  // actions
   const endCurrentGame = (): void => {
     const clonedGame = cloneDeep(games[currentGame.value !== null ? currentGame.value : 0])
     if (clonedGame) games[clonedGame.id] = clonedGame
@@ -77,5 +77,6 @@ export const useGameStore = defineStore('gameStore', () => {
     return id
   }
 
+  // Return interface
   return { currentGame, endCurrentGame, games, getCurrentGame, previousGames, startNewGame }
 })

@@ -16,10 +16,18 @@ import type { GameMode } from '@/types/Game'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { getStartingChessPieceTypes, getStartingDraughtsPieceTypes } from '@/utilities/pieces'
 
-export const usePiecesStore = defineStore('piecesStore', () => {
+export const usePieceStore = defineStore('pieceStore', () => {
+  // store dependencies
+
+  // state
   const sets: Record<number, PieceSet> = reactive({})
   const pieces: Record<number, Piece> = reactive({})
 
+  // getters
+
+  // ***
+
+  // methods
   const getSetPieces = (setID: PieceSetID): Piece[] => sets[setID].pieces.map(p => pieces[p])
 
   const generateStartingPieces = (pieceTypes: PieceType[], colour: PieceColour): PieceID[] => {
@@ -58,5 +66,14 @@ export const usePiecesStore = defineStore('piecesStore', () => {
     else return generateNewChessPieceSet(colour)
   }
 
-  return { generateNewSetFromGameMode, pieces, sets, getSetPieces }
+  const pieceCanMove = (piece: Piece): boolean => !!piece
+
+  const setPieceSelected = (piece: Piece) => alert('piece clicked' + piece.id)
+
+  const onPieceClicked = (piece: Piece) => {
+    if (pieceCanMove(piece)) setPieceSelected(piece)
+  }
+
+  // Return interface
+  return { generateNewSetFromGameMode, pieces, sets, getSetPieces, onPieceClicked }
 })
