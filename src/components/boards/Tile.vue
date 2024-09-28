@@ -61,8 +61,16 @@ const getSizeClass: ComputedRef<string> = computed(() => {
   else return 'w-12 h-12'
 })
 
+const getDestinationClass: ComputedRef<string> = computed(() => {
+  const isDest = tileStore.isPossibleDestinationTile(props.tile.id)
+  if (!isDest) return ''
+  if (props.tile.colour === TILE_COLOURS.WHITE) return 'bg-green-300'
+  if (props.tile.colour === TILE_COLOURS.BLACK) return 'bg-green-800'
+  else return ''
+})
+
 const getClass: ComputedRef<string> = computed(() => {
-  return `${getSizeClass.value} ${getColourClass.value} ${getBorderClass.value}`
+  return `${getSizeClass.value} ${getColourClass.value} ${getBorderClass.value} ${getDestinationClass.value}`
 })
 
 // methods

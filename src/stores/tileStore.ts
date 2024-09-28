@@ -81,6 +81,9 @@ export const useTileStore = defineStore('tileStore', () => {
     } else return TILE_COLOURS.UNKNOWN
   }
 
+  const isPossibleDestinationTile = (id: TileID): boolean =>
+    validDestinationTiles.value.includes(id)
+
   const makeNewTile = (board: Board, options: NewTileOptions): TileID => {
     const tile: Tile = {
       colour: getTileColour(board, options),
@@ -99,6 +102,7 @@ export const useTileStore = defineStore('tileStore', () => {
 
   // Return interface
   return {
+    isPossibleDestinationTile,
     makeNewTile,
     onTileClicked,
     tiles,
