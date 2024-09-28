@@ -22,6 +22,7 @@ import { usePlayerStore } from '@/stores/playerStore'
 import { useBoardStore } from '@/stores/boardStore'
 import { generateNewEmptyTileMatrix } from '@/utilities/boards'
 import { falsyNotZero } from '@/utilities/booleans'
+import type { Piece, PieceID } from '@/types/Piece'
 
 export const useTileStore = defineStore('tileStore', () => {
   // store dependencies
@@ -71,6 +72,12 @@ export const useTileStore = defineStore('tileStore', () => {
   })
 
   // methods
+  const getTilePiece = (tile: Tile): Piece | null => {
+    const pieceID: PieceID | null = gameStore.currentGame?.positions[tile.id] || null
+    if (pieceID === null) return null
+    else return pieceStore.pieces[pieceID]
+  }
+
   const getTileColour = (board: Board, options: NewTileOptions): TileColour => {
     if (board.type === BOARD_TYPES.STANDARD_CHECKERED_BOARD) {
       const [row, col] = options.position
@@ -97,7 +104,13 @@ export const useTileStore = defineStore('tileStore', () => {
   }
 
   const onTileClicked = (tile: Tile) => {
-    if (tile) pieceStore.deselectCurrentlyselectedPiece()
+    const piece: Piece | null = getTilePiece(tile) || null
+    // if the tile has a piece, act as if the piece was clicked
+    if (piece) return pieceStore.onPieceClicked(piece)
+    // else, if a valid destination tile, begin move
+    else if (isPossibleDestinationTile(tile.id)) gameStore.moveTo(tile.id)
+    // else, deselect currently selected piece
+    else pieceStore.deselectCurrentlySelectedPiece()
   }
 
   // Return interface

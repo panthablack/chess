@@ -13,8 +13,8 @@ export const calculatePossibleDestinationTilesForMen = (piece: Piece, player: Pl
   const tiles: TileID[] = []
   const { localPieceMatrix: lpm, localTileMatrix: ltm } = getLocalMatrices(piece, player)
   // if forward diagonal tiles empty and valid, enter those tiles into the array
-  if (lpm[0][0] !== null && ltm[0][0] !== null) tiles.push(ltm[0][0])
-  if (lpm[0][2] !== null && ltm[0][2] !== null) tiles.push(ltm[0][2])
+  if (lpm[0][0] === null && ltm[0][0] !== null) tiles.push(ltm[0][0])
+  if (lpm[0][2] === null && ltm[0][2] !== null) tiles.push(ltm[0][2])
   // if no opposition pieces on diagonal
   // calculate positions for all tiles in front
   // const playerStore = usePlayerStore()

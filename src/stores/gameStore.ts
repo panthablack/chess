@@ -5,6 +5,7 @@ import type {
   GameID,
   GameMode,
   GameOptions,
+  Move,
   MoveID,
   PieceTilePositionMap,
   TilePiecePositionMap,
@@ -12,7 +13,7 @@ import type {
 import { GAME_MODES } from '@/config/constants/games'
 import { cloneDeep } from 'lodash'
 import type { Player, PlayerID } from '@/types/Player'
-import type { BoardID, Tile } from '@/types/Board'
+import type { BoardID, Tile, TileID } from '@/types/Board'
 import { useBoardStore } from './boardStore'
 import { usePlayerStore } from './playerStore'
 import { getNextFreeNumericalKey, parseIntMap, reverseObject } from '@/utilities/objects'
@@ -29,7 +30,8 @@ export const useGameStore = defineStore('gameStore', () => {
 
   // state
   const currentGameID: Ref<GameID | null> = ref(null)
-  const games: Record<number, Game> = reactive({})
+  const games: Record<GameID, Game> = reactive({})
+  const moves: Record<MoveID, Move> = reactive({})
 
   // getters
   const currentGame: ComputedRef<Game | null> = computed(
@@ -64,6 +66,15 @@ export const useGameStore = defineStore('gameStore', () => {
     currentGameID.value = null
   }
 
+  const executeMove = (move: Move): void => {
+    if (!move || !currentGame.value?.positions) throw 'cannot execute move'
+    else {
+      currentGame.value.positions = move[1]
+      moves[getNextFreeNumericalKey(moves)] = move
+      pieceStore.deselectCurrentlySelectedPiece()
+    }
+  }
+
   const getInitialPositions = (
     mode: GameMode,
     playerIDs: PlayerID[],
@@ -73,6 +84,25 @@ export const useGameStore = defineStore('gameStore', () => {
     if (mode === GAME_MODES.CHESS) return setInitialChessPositions(players, tiles)
     else if (mode === GAME_MODES.DRAUGHTS) return setInitialDraughtsPositions(players, tiles)
     else throw 'Game Mode not recognised.'
+  }
+
+  const makeMove = (destination: TileID): Move => {
+    const selectedPieceID = pieceStore.selectedPieceID
+    const currentGamePositions = currentGame.value?.positions
+    if (!selectedPieceID || !currentGamePositions) throw 'cannot make move without game positions'
+    const newGamePositions = cloneDeep(currentGamePositions)
+    // remove currently selected piece from old place in positions map
+    const currentPiecePosition = pieceTilePositionMap.value[selectedPieceID]
+    if (!currentPiecePosition) throw 'cannot move piece'
+    newGamePositions[currentPiecePosition] = null
+    // add currently selected piece to new place in positions map
+    newGamePositions[destination] = selectedPieceID
+    return [cloneDeep(currentGamePositions), cloneDeep(newGamePositions)]
+  }
+
+  const moveTo = (destination: TileID): void => {
+    const move: Move = makeMove(destination)
+    executeMove(move)
   }
 
   const setInitialChessPositions = (players: Player[], tiles: Tile[]): TilePiecePositionMap =>
@@ -122,6 +152,7 @@ export const useGameStore = defineStore('gameStore', () => {
     currentGameID,
     endCurrentGame,
     games,
+    moveTo,
     pieceTilePositionMap,
     previousGames,
     startNewGame,

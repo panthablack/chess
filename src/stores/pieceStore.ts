@@ -67,7 +67,7 @@ export const usePieceStore = defineStore('pieceStore', () => {
   const currentPlayerOwnsPiece = (piece: Piece): boolean =>
     currentPlayersPieces.value.indexOf(piece.id) !== -1
 
-  const deselectCurrentlyselectedPiece = (): void => {
+  const deselectCurrentlySelectedPiece = (): void => {
     selectedPieceID.value = null
   }
 
@@ -127,7 +127,7 @@ export const usePieceStore = defineStore('pieceStore', () => {
   // Return interface
   return {
     currentGamePieces,
-    deselectCurrentlyselectedPiece,
+    deselectCurrentlySelectedPiece,
     generateNewSetFromGameMode,
     getSetPieces,
     onPieceClicked,
