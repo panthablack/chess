@@ -11,7 +11,7 @@
     "chess",
     "set"
   ],
-  "main": "./src/chess/index.ts",
+  "main": "./src/main.ts",
   "author": "James J. E. Randall",
   "license": "MIT",
   "bugs": {
