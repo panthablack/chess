@@ -19,7 +19,7 @@ import { usePlayerStore } from '@/stores/playerStore'
 import type { Player } from '@/types/Player'
 import { useTileStore } from '@/stores/tileStore'
 import { useGameStore } from '@/stores/gameStore'
-import type { Tile, TilePosition } from '@/types/Board'
+import type { TileID, TilePosition } from '@/types/Board'
 
 export const usePieceStore = defineStore('pieceStore', () => {
   // store dependencies
@@ -117,7 +117,7 @@ export const usePieceStore = defineStore('pieceStore', () => {
   const setPieceSelected = (piece: Piece) => (selectedPieceID.value = piece.id)
 
   const onPieceClicked = (piece: Piece) => {
-    const validDestinationTiles: Tile[] = tileStore.validDestinationTiles
+    const validDestinationTiles: TileID[] = tileStore.validDestinationTiles
     if (!validDestinationTiles) {
       //
     }

@@ -14,7 +14,7 @@ import { useRowStore } from '@/stores/rowStore'
 import { useTileStore } from './tileStore'
 import { computed, reactive, type ComputedRef } from 'vue'
 import { useGameStore } from './gameStore'
-import { positionOnBoard } from '@/utilities/boards'
+import { falsyNotZero } from '@/utilities/booleans'
 
 export const useBoardStore = defineStore('boardStore', () => {
   // store dependencies
@@ -41,6 +41,14 @@ export const useBoardStore = defineStore('boardStore', () => {
     return tiles
   }
 
+  const getBoardTileIDs = (boardID: BoardID): TileID[] => {
+    const board: Board = boards[boardID]
+    const rows: Row[] = board.rows.map(r => rowStore.rows[r])
+    const tiles: TileID[] = []
+    rows.forEach((r: Row) => r.tiles.forEach((t: TileID) => tiles.push(t)))
+    return tiles
+  }
+
   // methods
   const filterOutOffBoardPositions = (
     positions: TilePosition[],
@@ -48,7 +56,19 @@ export const useBoardStore = defineStore('boardStore', () => {
   ): TilePosition[] => {
     board = board || currentBoard.value || null
     if (!board || !positions) return []
-    else return positions.filter(p => !positionOnBoard(p, board))
+    else return positions.filter(p => !isValidPosition(p))
+  }
+
+  const isValidPosition = (position: TilePosition): boolean => {
+    const layout = currentBoard.value?.layout
+    if (!layout) return false // no valid position if no layout
+    const row = position[0]
+    const col = position[1]
+    // if either index is negative, falsyNonZero, or >= board length/width, return false
+    if (falsyNotZero(row) || falsyNotZero(col)) return false
+    else if (row < 0 || col < 0) return false
+    else if ((row >= layout[0], row >= layout[1])) return false
+    else return true
   }
 
   const makeNewBoard = (options?: NewBoardOptions, overrides?: Board): BoardID => {
@@ -70,5 +90,13 @@ export const useBoardStore = defineStore('boardStore', () => {
   }
 
   // Return interface
-  return { boards, currentBoard, getBoardTiles, filterOutOffBoardPositions, makeNewBoard }
+  return {
+    boards,
+    currentBoard,
+    filterOutOffBoardPositions,
+    getBoardTileIDs,
+    getBoardTiles,
+    isValidPosition,
+    makeNewBoard,
+  }
 })

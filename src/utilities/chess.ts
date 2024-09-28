@@ -1,5 +1,5 @@
 import { INITIAL_PIECE_POSITIONS_FOR_CHESS as INIT_POS } from '@/config/constants/games'
-import type { Tile } from '@/types/Board'
+import type { Tile, TileID } from '@/types/Board'
 import type { PieceTilePositionMap, TilePiecePositionMap } from '@/types/Game'
 import type { Player } from '@/types/Player'
 import { cloneDeep } from 'lodash'
@@ -11,7 +11,7 @@ export const calculatePossibleDestinationTilesForChess = (
   piece: Piece,
   player: Player,
   map: PieceTilePositionMap
-): Tile[] => {
+): TileID[] => {
   if (!piece || !player || !map) return []
   else return []
 }

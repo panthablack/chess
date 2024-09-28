@@ -1,5 +1,5 @@
 import { INITIAL_PIECE_POSITIONS_FOR_DRAUGHTS as INIT_POS } from '@/config/constants/games'
-import type { Tile } from '@/types/Board'
+import type { Tile, TileID } from '@/types/Board'
 import type { PieceTilePositionMap, TilePiecePositionMap } from '@/types/Game'
 import type { Player } from '@/types/Player'
 import { cloneDeep } from 'lodash'
@@ -7,13 +7,14 @@ import { usePieceStore } from '@/stores/pieceStore'
 import { setInitialPositions } from '@/utilities/games'
 import type { Piece } from '@/types/Piece'
 import { DRAUGHTS_PIECES } from '@/config/constants/pieces'
+import { getLocalMatrices } from '@/utilities/boards'
 
-export const calculatePossibleDestinationTilesForMen = (
-  piece: Piece,
-  player: Player,
-  map: PieceTilePositionMap
-): Tile[] => {
-  if (!piece || !player || !map) return []
+export const calculatePossibleDestinationTilesForMen = (piece: Piece, player: Player): TileID[] => {
+  const tiles: TileID[] = []
+  const { localTileMatrix, localPieceMatrix } = getLocalMatrices(piece, player)
+  // if forward diagonal tiles empty, enter those tiles into the array
+  if (localPieceMatrix && localTileMatrix) return tiles
+  // if no opposition pieces on diagonal
   // calculate positions for all tiles in front
   // const playerStore = usePlayerStore()
   // const boardStore = useBoardStore()
@@ -24,15 +25,17 @@ export const calculatePossibleDestinationTilesForMen = (
   //   )
   // filter out any tiles off the board
   // debugger
-  else return []
+  return tiles
 }
 
 export const calculatePossibleDestinationTilesForKings = (
   piece: Piece,
   player: Player,
   map: PieceTilePositionMap
-): Tile[] => {
+): TileID[] => {
   if (!piece || !player || !map) return []
+  // if diagonal tiles empty, enter those tiles into the array
+
   return []
 }
 
@@ -40,10 +43,10 @@ export const calculatePossibleDestinationTilesForDraughts = (
   piece: Piece,
   player: Player,
   map: PieceTilePositionMap
-): Tile[] => {
+): TileID[] => {
   if (!piece || !player || !map) return []
   if (piece.type === DRAUGHTS_PIECES.MAN)
-    return calculatePossibleDestinationTilesForMen(piece, player, map)
+    return calculatePossibleDestinationTilesForMen(piece, player)
   else if (piece.type === DRAUGHTS_PIECES.KING)
     return calculatePossibleDestinationTilesForKings(piece, player, map)
   else return []

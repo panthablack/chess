@@ -13,6 +13,14 @@ export type BoardLayout = [RowLength, ColumnLength]
 
 export type ColPosition = number
 
+export type LocalTileID = TileID | null
+
+export type LocalTileMatrix = [
+  [LocalTileID, LocalTileID, LocalTileID],
+  [LocalTileID, LocalTileID, LocalTileID],
+  [LocalTileID, LocalTileID, LocalTileID],
+]
+
 export type NewBoardOptions = {
   layout?: BoardLayout
   type?: (typeof BOARD_TYPES)[keyof typeof BOARD_TYPES]
@@ -51,6 +59,10 @@ export type TileColour = (typeof TILE_COLOURS)[keyof typeof TILE_COLOURS]
 
 export type TileID = number
 
+export type TileMatrix = (TileID | null)[][]
+
 export type TilePosition = [RowPosition, ColPosition]
+
+export type TilePositionMatrix = TileMatrix
 
 export type TileSize = (typeof TILE_SIZES)[keyof typeof TILE_SIZES]

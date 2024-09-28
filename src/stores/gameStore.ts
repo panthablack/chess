@@ -36,11 +36,16 @@ export const useGameStore = defineStore('gameStore', () => {
     () => games[currentGameID.value || 0] || null
   )
 
+  const currentPositions: ComputedRef<TilePiecePositionMap> = computed(
+    () => currentGame.value?.positions || {}
+  )
+
   const pieceTilePositionMap: ComputedRef<PieceTilePositionMap> = computed(() => {
     if (currentGame.value === null) return {}
-    const currentPositions: TilePiecePositionMap = currentGame.value.positions
     const currentPieces: Piece[] = pieceStore.currentGamePieces
-    const revPos: PieceTilePositionMap = parseIntMap(reverseObject(Object.assign(currentPositions)))
+    const revPos: PieceTilePositionMap = parseIntMap(
+      reverseObject(Object.assign(currentPositions.value))
+    )
     return currentPieces.reduce((a: PieceTilePositionMap, v: Piece) => {
       a[v.id] = revPos[v.id] || null
       return a

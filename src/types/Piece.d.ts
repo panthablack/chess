@@ -35,6 +35,14 @@ export type DraughtsPieceSet = {
   pieces: PieceID[]
 }
 
+export type LocalPieceID = PieceID | null
+
+export type LocalPieceMatrix = [
+  [LocalPieceID, LocalPieceID, LocalPieceID],
+  [LocalPieceID, LocalPieceID, LocalPieceID],
+  [LocalPieceID, LocalPieceID, LocalPieceID],
+]
+
 export type Piece = ChessPiece | DraughtsPiece
 
 export type PieceID = number

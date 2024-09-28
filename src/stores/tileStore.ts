@@ -1,19 +1,31 @@
 import { computed, reactive, ref, type ComputedRef, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { BOARD_TYPES, TILE_COLOURS, TILE_SIZES, TILE_TYPES } from '@/config/constants/boards'
-import type { Board, NewTileOptions, Tile, TileColour, TileID, TileSize } from '@/types/Board'
+import type {
+  Board,
+  NewTileOptions,
+  Tile,
+  TileColour,
+  TileID,
+  TilePositionMatrix,
+  TileSize,
+} from '@/types/Board'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { isEven, isOdd } from '@/utilities/numbers'
 import { usePieceStore } from '@/stores/pieceStore'
 import { useGameStore } from './gameStore'
-import type { PieceTilePositionMap } from '@/types/Game'
+import type { PieceTilePositionMap, TilePiecePositionMap } from '@/types/Game'
 import { GAME_MODES } from '@/config/constants/games'
 import { calculatePossibleDestinationTilesForChess } from '@/utilities/chess'
 import { calculatePossibleDestinationTilesForDraughts } from '@/utilities/draughts'
 import { usePlayerStore } from '@/stores/playerStore'
+import { useBoardStore } from '@/stores/boardStore'
+import { generateNewEmptyTileMatrix } from '@/utilities/boards'
+import { falsyNotZero } from '@/utilities/booleans'
 
 export const useTileStore = defineStore('tileStore', () => {
   // store dependencies
+  const boardStore = useBoardStore()
   const gameStore = useGameStore()
   const pieceStore = usePieceStore()
   const playerStore = usePlayerStore()
@@ -23,6 +35,42 @@ export const useTileStore = defineStore('tileStore', () => {
   const tileSize: Ref<TileSize> = ref(TILE_SIZES.MEDIUM)
 
   // getters
+  const activeTiles: ComputedRef<Tile[]> = computed(() =>
+    boardStore.currentBoard?.id ? boardStore.getBoardTiles(boardStore.currentBoard.id) : []
+  )
+
+  const activeTileIDs: ComputedRef<TileID[]> = computed(() =>
+    boardStore.currentBoard?.id ? boardStore.getBoardTileIDs(boardStore.currentBoard.id) : []
+  )
+
+  const tilePiecePositionMap: ComputedRef<TilePiecePositionMap> = computed(() => {
+    const pos: TilePiecePositionMap | undefined = gameStore.currentGame?.positions
+    if (!activeTileIDs.value || !pos) return {}
+    const map: TilePiecePositionMap = {}
+    activeTileIDs.value.forEach(t => (map[t] = falsyNotZero(pos[t]) ? null : pos[t]))
+    return map
+  })
+
+  const tilePositionMatrix: ComputedRef<TilePositionMatrix> = computed(() => {
+    const matrix: TilePositionMatrix = generateNewEmptyTileMatrix()
+    activeTiles.value.forEach(t => (matrix[t.position[0]][t.position[1]] = t.id))
+    return matrix
+  })
+
+  const validDestinationTiles: ComputedRef<TileID[]> = computed(() => {
+    const piece = pieceStore.selectedPiece
+    const currentGame = gameStore.currentGame || null
+    const player = playerStore.currentPlayer || null
+    const map: PieceTilePositionMap | undefined = currentGame?.positions
+    if (!piece || !player || !map) return []
+    if (currentGame?.mode === GAME_MODES.CHESS)
+      return calculatePossibleDestinationTilesForChess(piece, player, map)
+    else if (currentGame?.mode === GAME_MODES.DRAUGHTS)
+      return calculatePossibleDestinationTilesForDraughts(piece, player, map)
+    else return []
+  })
+
+  // methods
   const getTileColour = (board: Board, options: NewTileOptions): TileColour => {
     if (board.type === BOARD_TYPES.STANDARD_CHECKERED_BOARD) {
       const [row, col] = options.position
@@ -33,20 +81,6 @@ export const useTileStore = defineStore('tileStore', () => {
     } else return TILE_COLOURS.UNKNOWN
   }
 
-  const validDestinationTiles: ComputedRef<Tile[]> = computed(() => {
-    const piece = pieceStore.selectedPiece
-    const currentGame = gameStore.currentGame || null
-    const player = playerStore.currentPlayer || null
-    const map: PieceTilePositionMap = gameStore.pieceTilePositionMap
-    if (!piece || !player || !map) return []
-    if (currentGame?.mode === GAME_MODES.CHESS)
-      return calculatePossibleDestinationTilesForChess(piece, player, map)
-    else if (currentGame?.mode === GAME_MODES.DRAUGHTS)
-      return calculatePossibleDestinationTilesForDraughts(piece, player, map)
-    else return []
-  })
-
-  // methods
   const makeNewTile = (board: Board, options: NewTileOptions): TileID => {
     const tile: Tile = {
       colour: getTileColour(board, options),
@@ -64,5 +98,13 @@ export const useTileStore = defineStore('tileStore', () => {
   }
 
   // Return interface
-  return { makeNewTile, onTileClicked, tiles, tileSize, validDestinationTiles }
+  return {
+    makeNewTile,
+    onTileClicked,
+    tiles,
+    tilePiecePositionMap,
+    tilePositionMatrix,
+    tileSize,
+    validDestinationTiles,
+  }
 })
