@@ -59,7 +59,9 @@ export type TileColour = (typeof TILE_COLOURS)[keyof typeof TILE_COLOURS]
 
 export type TileID = number
 
-export type TileGrid = (TileID | null)[][]
+export type TileGrid = TileGridID[][]
+
+export type TileGridID = TileID | null
 
 export type TilePosition = [RowPosition, ColPosition]
 

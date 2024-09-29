@@ -63,6 +63,16 @@ export const usePieceStore = defineStore('pieceStore', () => {
     else return sets[currentPlayer.value.set].pieces
   })
 
+  const oppositionPieces: ComputedRef<Piece[]> = computed(() => {
+    const opponentSet = playerStore.opponent?.set
+    if (!opponentSet) return []
+    else return getSetPieces(opponentSet) || []
+  })
+
+  const oppositionPieceIDs: ComputedRef<PieceID[]> = computed(() =>
+    oppositionPieces.value.map(p => p.id)
+  )
+
   // methods
   const currentPlayerOwnsPiece = (piece: Piece): boolean =>
     currentPlayersPieces.value.indexOf(piece.id) !== -1
@@ -131,6 +141,8 @@ export const usePieceStore = defineStore('pieceStore', () => {
     generateNewSetFromGameMode,
     getSetPieces,
     onPieceClicked,
+    oppositionPieces,
+    oppositionPieceIDs,
     pieceCanBeSelected,
     pieces,
     selectedPiece,

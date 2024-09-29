@@ -7,6 +7,7 @@ import type { GameMode } from '@/types/Game'
 import { PIECE_COLOURS } from '@/config/constants/pieces'
 import { is2PlayerGame } from '@/utilities/games'
 import { useGameStore } from './gameStore'
+import type { PieceID } from '@/types/Piece'
 
 export const usePlayerStore = defineStore('playerStore', () => {
   // store dependencies
@@ -26,16 +27,33 @@ export const usePlayerStore = defineStore('playerStore', () => {
     else return players[gameStore.currentGame.currentPlayerID]
   })
 
+  const firstPlayer: ComputedRef<Player | null> = computed(() => {
+    if (!activePlayers.value?.length) return null
+    else return activePlayers.value.find(p => p.playerNumber === 1) || null
+  })
+
+  const opponent: ComputedRef<Player | null> = computed(() => {
+    const currentPlayerID = currentPlayer.value?.id
+    if (!currentPlayerID || !activePlayers.value.length) return null
+    else return activePlayers.value.find(p => p.id !== currentPlayerID) || null
+  })
+
   const nextPlayer: ComputedRef<Player | null> = computed(() => {
     const currentPlayerNumber = currentPlayer.value?.playerNumber
     if (!activePlayers.value?.length || !currentPlayerNumber) return null
     else {
       const nextPlayerNumber = currentPlayerNumber + 1
-      return activePlayers.value.find(p => p.playerNumber === nextPlayerNumber) || null
+      return activePlayers.value.find(p => p.playerNumber === nextPlayerNumber) || firstPlayer.value
     }
   })
 
   // methods
+  const pieceBelongsToPlayer = (pieceID: PieceID, playerID: PlayerID): boolean => {
+    const setID = players[playerID]?.set
+    if (!setID) return false
+    else return pieceStore.sets[setID]?.pieces?.includes(pieceID) || false
+  }
+
   const getPlayerColour = (mode: GameMode, playerNumber: number) => {
     if (is2PlayerGame(mode) && playerNumber === 0) return PIECE_COLOURS.WHITE
     else if (is2PlayerGame(mode) && playerNumber === 1) return PIECE_COLOURS.BLACK
@@ -67,5 +85,14 @@ export const usePlayerStore = defineStore('playerStore', () => {
   }
 
   // Return interface
-  return { activePlayers, currentPlayer, players, generatePlayers, makeNewPlayer, nextPlayer }
+  return {
+    activePlayers,
+    currentPlayer,
+    generatePlayers,
+    makeNewPlayer,
+    nextPlayer,
+    opponent,
+    pieceBelongsToPlayer,
+    players,
+  }
 })

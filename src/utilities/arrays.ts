@@ -10,6 +10,12 @@ export const filterOutNonNumericalValues = (a: any[]) =>
 
 export const getMaxValue = (a: number[]): number => Math.max(...a)
 
+export const pushIfExists = (array: any[], object: Record<any, any>, key: any): any[] => {
+  const resolved: any = object[key]
+  if (resolved !== undefined && resolved !== null) array.push(resolved)
+  return array
+}
+
 export const removeIfMatched = (needle: any, haystack: any[]): any => {
   const location = haystack.findIndex(v => v === needle)
   if (location !== -1) return haystack.splice(location, 1)[0]

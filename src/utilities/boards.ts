@@ -4,9 +4,10 @@ import { useTileStore } from '@/stores/tileStore'
 import type { ColPosition, LocalTileGrid, RowPosition, TileGrid } from '@/types/Board'
 import type { LocalPieceGrid, Piece } from '@/types/Piece'
 import type { Player } from '@/types/Player'
-import { generateNullGrid } from '@/utilities/grids'
-import { falsyNotZero } from './booleans'
-import { getLocalPieceGrid } from './pieces'
+import { generateNullGrid, rotateGrid180Degrees } from '@/utilities/grids'
+import { falsyNotZero } from '@/utilities/booleans'
+import { getLocalPieceGrid } from '@/utilities/pieces'
+import { isOdd } from '@/utilities/numbers'
 
 export type LocalGridCollection = {
   localTileGrid: LocalTileGrid
@@ -23,13 +24,15 @@ export const generateEmptyLocalGridCollection = (): LocalGridCollection => ({
   localPieceGrid: generateNewEmptyLocalTileGrid(),
 })
 
-export const getLocalMatrices = (piece: Piece, player: Player): LocalGridCollection => {
+export const getLocalGrids = (piece: Piece, player: Player): LocalGridCollection => {
   const tileStore = useTileStore()
   const map = tileStore.tilePiecePositionMap
   if (!piece || !player || !map) return generateEmptyLocalGridCollection()
-  const localTileGrid = getLocalTileGrid(piece)
-  const localPieceGrid = getLocalPieceGrid(localTileGrid)
-  return { localTileGrid, localPieceGrid }
+  const localTileGrid: LocalTileGrid = getLocalTileGrid(piece)
+  const localPieceGrid: LocalPieceGrid = getLocalPieceGrid(localTileGrid)
+  const localGrids = { localTileGrid, localPieceGrid }
+  if (isOdd(player.playerNumber)) return localGrids
+  else return rotateLocalGrids(localGrids)
 }
 
 export const getSurroundingPositions = (
@@ -71,4 +74,10 @@ export const getLocalTileGrid = (piece: Piece): LocalTileGrid => {
   if (centreTileID === null || falsyNotZero(centreTileID)) return grid
   const ctPos = tileStore.tiles[centreTileID].position
   return getSurroundingTiles(tileStore.tilePositionGrid, [ctPos[0], ctPos[1]])
+}
+
+export const rotateLocalGrids = (grids: LocalGridCollection): LocalGridCollection => {
+  const rTileGrid = rotateGrid180Degrees(grids.localTileGrid) as LocalTileGrid
+  const rPieceGrid = rotateGrid180Degrees(grids.localPieceGrid) as LocalPieceGrid
+  return { localTileGrid: rTileGrid, localPieceGrid: rPieceGrid }
 }

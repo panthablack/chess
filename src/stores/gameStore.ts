@@ -17,10 +17,13 @@ import type { BoardID, Tile, TileID } from '@/types/Board'
 import { useBoardStore } from './boardStore'
 import { usePlayerStore } from './playerStore'
 import { getNextFreeNumericalKey, parseIntMap, reverseObject } from '@/utilities/objects'
-import { getInitialPlayerPositionsForChess } from '@/utilities/chess'
-import { getInitialPlayerPositionsForDraughts } from '@/utilities/draughts'
+import { detectTakenPiecesForChess, getInitialPlayerPositionsForChess } from '@/utilities/chess'
+import {
+  detectTakenPiecesForDraughts,
+  getInitialPlayerPositionsForDraughts,
+} from '@/utilities/draughts'
 import { usePieceStore } from '@/stores/pieceStore'
-import type { Piece } from '@/types/Piece'
+import type { Piece, PieceID } from '@/types/Piece'
 
 export const useGameStore = defineStore('gameStore', () => {
   // store dependencies
@@ -64,7 +67,18 @@ export const useGameStore = defineStore('gameStore', () => {
     // change to player with next player number
     if (!currentGame.value || !nextPlayerID) throw 'cannot change player'
     else currentGame.value.currentPlayerID = nextPlayerID
-    alert(JSON.stringify(playerStore.currentPlayer))
+  }
+
+  const detectTakenPieces = (move: Move): PieceID[] => {
+    if (currentGame.value?.mode === GAME_MODES.CHESS) return detectTakenPiecesForChess(move)
+    else if (currentGame.value?.mode === GAME_MODES.DRAUGHTS)
+      return detectTakenPiecesForDraughts(move)
+    else return []
+  }
+
+  const handlePossibleTakes = (move: Move): void => {
+    const takenPieces = detectTakenPieces(move)
+    if (takenPieces.length) alert(JSON.stringify(takenPieces))
   }
 
   const endCurrentGame = (): void => {
@@ -78,7 +92,10 @@ export const useGameStore = defineStore('gameStore', () => {
     if (!move || !currentGame.value?.positions) throw 'cannot execute move'
     else {
       currentGame.value.positions = move[1]
-      moves[getNextFreeNumericalKey(moves)] = move
+      const moveID = getNextFreeNumericalKey(moves)
+      moves[moveID] = move
+      currentGame.value.moveIDs.push(moveID)
+      handlePossibleTakes(move)
       pieceStore.deselectCurrentlySelectedPiece()
       changePlayer()
     }
@@ -161,6 +178,7 @@ export const useGameStore = defineStore('gameStore', () => {
     currentGameID,
     endCurrentGame,
     games,
+    moves,
     moveTo,
     pieceTilePositionMap,
     previousGames,
