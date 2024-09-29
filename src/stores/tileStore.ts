@@ -7,7 +7,7 @@ import type {
   Tile,
   TileColour,
   TileID,
-  TilePositionMatrix,
+  TilePositionGrid,
   TileSize,
 } from '@/types/Board'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
@@ -20,7 +20,7 @@ import { calculatePossibleDestinationTilesForChess } from '@/utilities/chess'
 import { calculatePossibleDestinationTilesForDraughts } from '@/utilities/draughts'
 import { usePlayerStore } from '@/stores/playerStore'
 import { useBoardStore } from '@/stores/boardStore'
-import { generateNewEmptyTileMatrix } from '@/utilities/boards'
+import { generateNewEmptyTileGrid } from '@/utilities/boards'
 import { falsyNotZero } from '@/utilities/booleans'
 import type { Piece, PieceID } from '@/types/Piece'
 
@@ -52,10 +52,10 @@ export const useTileStore = defineStore('tileStore', () => {
     return map
   })
 
-  const tilePositionMatrix: ComputedRef<TilePositionMatrix> = computed(() => {
-    const matrix: TilePositionMatrix = generateNewEmptyTileMatrix()
-    activeTiles.value.forEach(t => (matrix[t.position[0]][t.position[1]] = t.id))
-    return matrix
+  const tilePositionGrid: ComputedRef<TilePositionGrid> = computed(() => {
+    const grid: TilePositionGrid = generateNewEmptyTileGrid()
+    activeTiles.value.forEach(t => (grid[t.position[0]][t.position[1]] = t.id))
+    return grid
   })
 
   const validDestinationTiles: ComputedRef<TileID[]> = computed(() => {
@@ -120,7 +120,7 @@ export const useTileStore = defineStore('tileStore', () => {
     onTileClicked,
     tiles,
     tilePiecePositionMap,
-    tilePositionMatrix,
+    tilePositionGrid,
     tileSize,
     validDestinationTiles,
   }

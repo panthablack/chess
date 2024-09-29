@@ -1,35 +1,35 @@
 import { useBoardStore } from '@/stores/boardStore'
 import { useGameStore } from '@/stores/gameStore'
 import { useTileStore } from '@/stores/tileStore'
-import type { ColPosition, LocalTileMatrix, RowPosition, TileMatrix } from '@/types/Board'
-import type { LocalPieceMatrix, Piece } from '@/types/Piece'
+import type { ColPosition, LocalTileGrid, RowPosition, TileGrid } from '@/types/Board'
+import type { LocalPieceGrid, Piece } from '@/types/Piece'
 import type { Player } from '@/types/Player'
-import { generateNullMatrix } from '@/utilities/matrices'
+import { generateNullGrid } from '@/utilities/grids'
 import { falsyNotZero } from './booleans'
-import { getLocalPieceMatrix } from './pieces'
+import { getLocalPieceGrid } from './pieces'
 
-export type LocalMatrixCollection = {
-  localTileMatrix: LocalTileMatrix
-  localPieceMatrix: LocalPieceMatrix
+export type LocalGridCollection = {
+  localTileGrid: LocalTileGrid
+  localPieceGrid: LocalPieceGrid
 }
 
-export const generateNewEmptyLocalTileMatrix = (): LocalTileMatrix =>
-  generateNullMatrix(3, 3) as LocalTileMatrix
+export const generateNewEmptyLocalTileGrid = (): LocalTileGrid =>
+  generateNullGrid(3, 3) as LocalTileGrid
 
-export const generateNewEmptyTileMatrix = (): TileMatrix => generateNullMatrix(8, 8)
+export const generateNewEmptyTileGrid = (): TileGrid => generateNullGrid(8, 8)
 
-export const generateEmptyLocalMatrixCollection = (): LocalMatrixCollection => ({
-  localTileMatrix: generateNewEmptyLocalTileMatrix(),
-  localPieceMatrix: generateNewEmptyLocalTileMatrix(),
+export const generateEmptyLocalGridCollection = (): LocalGridCollection => ({
+  localTileGrid: generateNewEmptyLocalTileGrid(),
+  localPieceGrid: generateNewEmptyLocalTileGrid(),
 })
 
-export const getLocalMatrices = (piece: Piece, player: Player): LocalMatrixCollection => {
+export const getLocalMatrices = (piece: Piece, player: Player): LocalGridCollection => {
   const tileStore = useTileStore()
   const map = tileStore.tilePiecePositionMap
-  if (!piece || !player || !map) return generateEmptyLocalMatrixCollection()
-  const localTileMatrix = getLocalTileMatrix(piece)
-  const localPieceMatrix = getLocalPieceMatrix(localTileMatrix)
-  return { localTileMatrix, localPieceMatrix }
+  if (!piece || !player || !map) return generateEmptyLocalGridCollection()
+  const localTileGrid = getLocalTileGrid(piece)
+  const localPieceGrid = getLocalPieceGrid(localTileGrid)
+  return { localTileGrid, localPieceGrid }
 }
 
 export const getSurroundingPositions = (
@@ -40,35 +40,35 @@ export const getSurroundingPositions = (
   )
 
 export const getSurroundingTiles = (
-  tiles: TileMatrix,
+  tiles: TileGrid,
   center: [RowPosition, ColPosition]
-): LocalTileMatrix => {
+): LocalTileGrid => {
   const boardStore = useBoardStore()
-  const matrix: LocalTileMatrix = generateNewEmptyLocalTileMatrix()
+  const grid: LocalTileGrid = generateNewEmptyLocalTileGrid()
   // set center tile
   const ct = tiles[center[0]][center[1]]
-  if (!ct) return matrix
-  else matrix[1][1] = ct
+  if (!ct) return grid
+  else grid[1][1] = ct
   // set surrounding tiles if there
   const surrPos = getSurroundingPositions(center)
   surrPos.forEach((r, rIndex) =>
     r.forEach((p, cIndex) => {
-      if (p[0] < 0 || p[1] < 0) matrix[rIndex][cIndex] = null
-      else if (!tiles[p[0]]) matrix[rIndex][cIndex] = null
+      if (p[0] < 0 || p[1] < 0) grid[rIndex][cIndex] = null
+      else if (!tiles[p[0]]) grid[rIndex][cIndex] = null
       else
-        matrix[rIndex][cIndex] = boardStore.isValidPosition([p[0], p[1]]) ? tiles[p[0]][p[1]] : null
+        grid[rIndex][cIndex] = boardStore.isValidPosition([p[0], p[1]]) ? tiles[p[0]][p[1]] : null
     })
   )
-  return matrix
+  return grid
 }
 
-export const getLocalTileMatrix = (piece: Piece): LocalTileMatrix => {
+export const getLocalTileGrid = (piece: Piece): LocalTileGrid => {
   const tileStore = useTileStore()
   const gameStore = useGameStore()
-  const matrix: LocalTileMatrix = generateNewEmptyLocalTileMatrix()
-  // if no center tile id, return null matrix
+  const grid: LocalTileGrid = generateNewEmptyLocalTileGrid()
+  // if no center tile id, return null grid
   const centreTileID = gameStore.pieceTilePositionMap[piece.id]
-  if (centreTileID === null || falsyNotZero(centreTileID)) return matrix
+  if (centreTileID === null || falsyNotZero(centreTileID)) return grid
   const ctPos = tileStore.tiles[centreTileID].position
-  return getSurroundingTiles(tileStore.tilePositionMatrix, [ctPos[0], ctPos[1]])
+  return getSurroundingTiles(tileStore.tilePositionGrid, [ctPos[0], ctPos[1]])
 }

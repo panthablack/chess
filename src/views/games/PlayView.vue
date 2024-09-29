@@ -7,7 +7,7 @@
       <div class="playerInfoBar flex gap-4 p-2 mb-2 items-center justify-between">
         <div
           class="playerDetailsContainer"
-          v-for="player in playerStore.currentPlayers"
+          v-for="player in playerStore.activePlayers"
           :key="player.id"
         >
           {{ player.name }}

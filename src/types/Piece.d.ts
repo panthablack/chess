@@ -37,7 +37,7 @@ export type DraughtsPieceSet = {
 
 export type LocalPieceID = PieceID | null
 
-export type LocalPieceMatrix = [
+export type LocalPieceGrid = [
   [LocalPieceID, LocalPieceID, LocalPieceID],
   [LocalPieceID, LocalPieceID, LocalPieceID],
   [LocalPieceID, LocalPieceID, LocalPieceID],

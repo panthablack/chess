@@ -59,6 +59,14 @@ export const useGameStore = defineStore('gameStore', () => {
   )
 
   // methods
+  const changePlayer = (): void => {
+    const nextPlayerID = playerStore.nextPlayer?.id
+    // change to player with next player number
+    if (!currentGame.value || !nextPlayerID) throw 'cannot change player'
+    else currentGame.value.currentPlayerID = nextPlayerID
+    alert(JSON.stringify(playerStore.currentPlayer))
+  }
+
   const endCurrentGame = (): void => {
     if (currentGame.value === null) return
     const clonedGame = cloneDeep(currentGame.value)
@@ -72,6 +80,7 @@ export const useGameStore = defineStore('gameStore', () => {
       currentGame.value.positions = move[1]
       moves[getNextFreeNumericalKey(moves)] = move
       pieceStore.deselectCurrentlySelectedPiece()
+      changePlayer()
     }
   }
 
@@ -123,7 +132,7 @@ export const useGameStore = defineStore('gameStore', () => {
     const boardID: BoardID = boardStore.makeNewBoard()
     const tiles: Tile[] = boardStore.getBoardTiles(boardID)
 
-    // generate positions matrix based on board (matrix/array structure) and piece ids
+    // generate positions grid based on board (grid/array structure) and piece ids
     // (contents, e.g., id or null)
     const positions: TilePiecePositionMap = getInitialPositions(mode, playerIDs, tiles)
 

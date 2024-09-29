@@ -15,7 +15,7 @@ export type ColPosition = number
 
 export type LocalTileID = TileID | null
 
-export type LocalTileMatrix = [
+export type LocalTileGrid = [
   [LocalTileID, LocalTileID, LocalTileID],
   [LocalTileID, LocalTileID, LocalTileID],
   [LocalTileID, LocalTileID, LocalTileID],
@@ -59,10 +59,10 @@ export type TileColour = (typeof TILE_COLOURS)[keyof typeof TILE_COLOURS]
 
 export type TileID = number
 
-export type TileMatrix = (TileID | null)[][]
+export type TileGrid = (TileID | null)[][]
 
 export type TilePosition = [RowPosition, ColPosition]
 
-export type TilePositionMatrix = TileMatrix
+export type TilePositionGrid = TileGrid
 
 export type TileSize = (typeof TILE_SIZES)[keyof typeof TILE_SIZES]
