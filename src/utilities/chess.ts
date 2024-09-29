@@ -17,7 +17,7 @@ export const calculatePossibleDestinationTilesForChess = (
 }
 
 export const detectTakenPiecesForChess = (move: Move): PieceID[] => {
-  alert(JSON.stringify(move))
+  console.log(move)
   return []
 }
 

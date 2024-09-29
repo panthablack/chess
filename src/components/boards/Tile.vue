@@ -5,11 +5,13 @@
     @click="onTileClicked"
   >
     <div class="tileContent w-full h-full flex items-center gap-0 justify-center">
-      <Piece
-        v-if="tilePiece"
-        class="content"
-        :piece="tilePiece"
-      />
+      <Transition name="fade">
+        <Piece
+          v-if="tilePiece"
+          class="content"
+          :piece="tilePiece"
+        />
+      </Transition>
       <slot />
     </div>
   </div>

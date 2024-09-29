@@ -8,6 +8,14 @@ import { setInitialPositions } from '@/utilities/games'
 import type { Piece, PieceID } from '@/types/Piece'
 import { DRAUGHTS_PIECES } from '@/config/constants/pieces'
 import { getLocalGrids } from '@/utilities/boards'
+import {
+  getNumberOfSquaresMoved,
+  getPositionBetween,
+  getPositionsFromMove,
+} from '@/utilities/moves'
+import { useGameStore } from '@/stores/gameStore'
+import { getTileByPosition } from './tiles'
+import { useTileStore } from '@/stores/tileStore'
 
 export const calculatePossibleDestinationTilesForMen = (piece: Piece, player: Player): TileID[] => {
   const pieceStore = usePieceStore()
@@ -68,8 +76,30 @@ export const calculatePossibleDestinationTilesForDraughts = (
 }
 
 export const detectTakenPiecesForDraughts = (move: Move): PieceID[] => {
-  alert(JSON.stringify(move))
-  return []
+  const numSquaresMoved: number = getNumberOfSquaresMoved(move)
+  const takenPieces = []
+  if (numSquaresMoved == 4) {
+    const takenPiece = getTakenPieceIDDraughts(move)
+    if (takenPiece) takenPieces.push(takenPiece)
+  }
+  return takenPieces
+}
+
+export const detectTileBetweenDiagonal = (move: Move): Tile | null => {
+  if (!move || !move?.before || !move?.after) return null
+  const tileStore = useTileStore()
+  const [oldPosition, newPosition] = getPositionsFromMove(move)
+  const positionBetween = getPositionBetween(oldPosition, newPosition)
+  return getTileByPosition(tileStore.activeTiles, positionBetween)
+}
+
+export const getTakenPieceIDDraughts = (move: Move): PieceID | null => {
+  const gameStore = useGameStore()
+  const positions = gameStore.currentGame?.positions
+  if (!positions) throw 'cannot detect position of taken piece'
+  const tileBetween = detectTileBetweenDiagonal(move)
+  if (!tileBetween?.id) return null
+  return positions[tileBetween.id] || null
 }
 
 export const getInitialPlayerPositionsForDraughts = (

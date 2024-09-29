@@ -24,7 +24,11 @@ export type GameOptions = {
 
 export type MoveID = number
 
-export type Move = [TilePiecePositionMap, TilePiecePositionMap] // Before and After, respectively
+export type Move = {
+  id: number
+  before: TilePiecePositionMap
+  after: TilePiecePositionMap
+}
 
 export type TilePiecePositionMap = Record<TileID, PieceID | null>
 

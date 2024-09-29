@@ -115,6 +115,7 @@ export const useTileStore = defineStore('tileStore', () => {
 
   // Return interface
   return {
+    activeTiles,
     isPossibleDestinationTile,
     makeNewTile,
     onTileClicked,

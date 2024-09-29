@@ -78,7 +78,18 @@ export const useGameStore = defineStore('gameStore', () => {
 
   const handlePossibleTakes = (move: Move): void => {
     const takenPieces = detectTakenPieces(move)
-    if (takenPieces.length) alert(JSON.stringify(takenPieces))
+    if (takenPieces.length) handleTakenPieces(move, takenPieces)
+  }
+
+  const handleTakenPieces = (move: Move, pieces: PieceID[]): void => {
+    if (!currentGame.value) return
+    // update move positions
+    const newPositions: TilePiecePositionMap = Object.fromEntries(
+      Object.entries(move.after).filter(e => e[1] && !pieces.includes(e[1]))
+    )
+    moves[move.id].after = newPositions
+    // remove pieces from board
+    currentGame.value.positions = newPositions
   }
 
   const endCurrentGame = (): void => {
@@ -91,10 +102,8 @@ export const useGameStore = defineStore('gameStore', () => {
   const executeMove = (move: Move): void => {
     if (!move || !currentGame.value?.positions) throw 'cannot execute move'
     else {
-      currentGame.value.positions = move[1]
-      const moveID = getNextFreeNumericalKey(moves)
-      moves[moveID] = move
-      currentGame.value.moveIDs.push(moveID)
+      currentGame.value.positions = move.after
+      currentGame.value.moveIDs.push(move.id)
       handlePossibleTakes(move)
       pieceStore.deselectCurrentlySelectedPiece()
       changePlayer()
@@ -123,7 +132,13 @@ export const useGameStore = defineStore('gameStore', () => {
     newGamePositions[currentPiecePosition] = null
     // add currently selected piece to new place in positions map
     newGamePositions[destination] = selectedPieceID
-    return [cloneDeep(currentGamePositions), cloneDeep(newGamePositions)]
+    const move: Move = {
+      id: getNextFreeNumericalKey(moves),
+      before: cloneDeep(currentGamePositions),
+      after: cloneDeep(newGamePositions),
+    }
+    moves[move.id] = move
+    return move
   }
 
   const moveTo = (destination: TileID): void => {

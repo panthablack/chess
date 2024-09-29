@@ -124,8 +124,6 @@ export const usePieceStore = defineStore('pieceStore', () => {
 
   const pieceCanMove = (piece: Piece): boolean => !!piece
 
-  const setPieceSelected = (piece: Piece) => (selectedPieceID.value = piece.id)
-
   const onPieceClicked = (piece: Piece) => {
     const validDestinationTiles: TileID[] = tileStore.validDestinationTiles
     if (!validDestinationTiles) {
@@ -133,6 +131,8 @@ export const usePieceStore = defineStore('pieceStore', () => {
     }
     if (pieceCanBeSelected(piece)) setPieceSelected(piece)
   }
+
+  const setPieceSelected = (piece: Piece) => (selectedPieceID.value = piece.id)
 
   // Return interface
   return {
