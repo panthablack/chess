@@ -1,5 +1,5 @@
 import { useTileStore } from '@/stores/tileStore'
-import type { Tile, TilePosition } from '@/types/Board'
+import type { Tile, TileID, TilePosition } from '@/types/Board'
 import { getPositionBetween, getPositionsFromMove } from '@/utilities/moves'
 import { useBoardStore } from '@/stores/boardStore'
 import { useGameStore } from '@/stores/gameStore'
@@ -8,6 +8,17 @@ import type { Piece } from '@/types/Piece'
 import { generateNullGrid } from '@/utilities/grids'
 import { falsyNotZero } from '@/utilities/booleans'
 import type { Move } from '@/types/Game'
+import type { Player } from '@/types/Player'
+import { usePieceStore } from '@/stores/pieceStore'
+import { getLocalGrids } from '@/utilities/boards'
+
+export const detectTileBetweenDiagonal = (move: Move): Tile | null => {
+  if (!move || !move?.before || !move?.after) return null
+  const tileStore = useTileStore()
+  const [oldPosition, newPosition] = getPositionsFromMove(move)
+  const positionBetween = getPositionBetween(oldPosition, newPosition)
+  return getTileByPosition(tileStore.activeTiles, positionBetween)
+}
 
 export const getLocalTileGrid = (piece: Piece): LocalTileGrid => {
   const tileStore = useTileStore()
@@ -62,10 +73,36 @@ export const getTileByPosition = (tiles: Tile[], position: TilePosition): Tile |
     return rowMatch && colMatch
   }) || null
 
-export const detectTileBetweenDiagonal = (move: Move): Tile | null => {
-  if (!move || !move?.before || !move?.after) return null
-  const tileStore = useTileStore()
-  const [oldPosition, newPosition] = getPositionsFromMove(move)
-  const positionBetween = getPositionBetween(oldPosition, newPosition)
-  return getTileByPosition(tileStore.activeTiles, positionBetween)
+export const pushIfTileBeyondIsFree = (
+  target: TileID[],
+  piece: Piece,
+  player: Player,
+  row: number,
+  col: number
+): void => {
+  const pieceStore = usePieceStore()
+  const oppositionPieceIDs = pieceStore.oppositionPieceIDs
+  const { localPieceGrid: lpm } = getLocalGrids(piece, player)
+  if (lpm[row][col] !== null) {
+    if (oppositionPieceIDs.includes(lpm[row][col])) {
+      // check if square beyond opposition piece is empty and exists
+      const { localPieceGrid: lpmBeyond, localTileGrid: ltmBeyond } = getLocalGrids(
+        pieceStore.pieces[lpm[row][col]],
+        player
+      )
+      if (lpmBeyond[row][col] === null && ltmBeyond[row][col] !== null)
+        target.push(ltmBeyond[row][col])
+    }
+  }
+}
+
+export const pushIfTileIsEmpty = (
+  target: TileID[],
+  piece: Piece,
+  player: Player,
+  row: number,
+  col: number
+): void => {
+  const { localPieceGrid: lpm, localTileGrid: ltm } = getLocalGrids(piece, player)
+  if (lpm[row][col] === null && ltm[row][col] !== null) target.push(ltm[row][col])
 }
