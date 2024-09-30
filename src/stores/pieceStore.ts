@@ -12,7 +12,7 @@ import type {
 } from '@/types/Piece'
 import { GAME_MODES } from '@/config/constants/games'
 import { CHESS_PIECE_SET_STYLES, DRAUGHTS_PIECE_SET_STYLES } from '@/config/constants/pieces'
-import type { GameMode } from '@/types/Game'
+import type { GameMode, PieceTilePositionMap } from '@/types/Game'
 import { getNextFreeNumericalKey } from '@/utilities/objects'
 import { getStartingChessPieceTypes, getStartingDraughtsPieceTypes } from '@/utilities/pieces'
 import { usePlayerStore } from '@/stores/playerStore'
@@ -97,7 +97,7 @@ export const usePieceStore = defineStore('pieceStore', () => {
     const set: ChessPieceSet = {
       id: getNextFreeNumericalKey(sets),
       style: CHESS_PIECE_SET_STYLES.CLASSIC,
-      pieces: generateStartingPieces(getStartingChessPieceTypes(), colour),
+      pieces: generateStartingPieces(getStartingChessPieceTypes(colour), colour),
     }
     sets[set.id] = set
     return set.id
@@ -107,7 +107,7 @@ export const usePieceStore = defineStore('pieceStore', () => {
     const set: DraughtsPieceSet = {
       id: getNextFreeNumericalKey(sets),
       style: DRAUGHTS_PIECE_SET_STYLES.CLASSIC,
-      pieces: generateStartingPieces(getStartingDraughtsPieceTypes(), colour),
+      pieces: generateStartingPieces(getStartingDraughtsPieceTypes(colour), colour),
     }
     sets[set.id] = set
     return set.id
@@ -119,16 +119,25 @@ export const usePieceStore = defineStore('pieceStore', () => {
     else return generateNewChessPieceSet(colour)
   }
 
+  const getPiecePlayer = (pieceID: PieceID): Player | null =>
+    playerStore.activePlayers.reduce((a: Player | null, v: Player) => {
+      if (playerStore.pieceBelongsToPlayer(pieceID, v.id)) return v
+      else return a
+    }, null)
+
+  const getPiecePosition = (pieceID: PieceID): TilePosition | null => {
+    const map: PieceTilePositionMap = gameStore.pieceTilePositionMap
+    const tileID: TileID | null = map[pieceID]
+    if (tileID === null) return null
+    else return tileStore.tiles[tileID]?.position || null
+  }
+
   const pieceCanBeSelected = (piece: Piece): boolean =>
     pieceCanMove(piece) && currentPlayerOwnsPiece(piece)
 
   const pieceCanMove = (piece: Piece): boolean => !!piece
 
   const onPieceClicked = (piece: Piece) => {
-    const validDestinationTiles: TileID[] = tileStore.validDestinationTiles
-    if (!validDestinationTiles) {
-      //
-    }
     if (pieceCanBeSelected(piece)) setPieceSelected(piece)
   }
 
@@ -139,6 +148,8 @@ export const usePieceStore = defineStore('pieceStore', () => {
     currentGamePieces,
     deselectCurrentlySelectedPiece,
     generateNewSetFromGameMode,
+    getPiecePlayer,
+    getPiecePosition,
     getSetPieces,
     onPieceClicked,
     oppositionPieces,

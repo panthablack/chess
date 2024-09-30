@@ -17,10 +17,15 @@ import type { BoardID, Tile, TileID } from '@/types/Board'
 import { useBoardStore } from './boardStore'
 import { usePlayerStore } from './playerStore'
 import { getNextFreeNumericalKey, parseIntMap, reverseObject } from '@/utilities/objects'
-import { detectTakenPiecesForChess, getInitialPlayerPositionsForChess } from '@/utilities/chess'
+import {
+  detectTakenPiecesForChess,
+  getInitialPlayerPositionsForChess,
+  handlePossibleTransformationsForChess,
+} from '@/utilities/chess'
 import {
   detectTakenPiecesForDraughts,
   getInitialPlayerPositionsForDraughts,
+  handlePossibleTransformationsForDraughts,
 } from '@/utilities/draughts'
 import { usePieceStore } from '@/stores/pieceStore'
 import type { Piece, PieceID } from '@/types/Piece'
@@ -76,22 +81,6 @@ export const useGameStore = defineStore('gameStore', () => {
     else return []
   }
 
-  const handlePossibleTakes = (move: Move): void => {
-    const takenPieces = detectTakenPieces(move)
-    if (takenPieces.length) handleTakenPieces(move, takenPieces)
-  }
-
-  const handleTakenPieces = (move: Move, pieces: PieceID[]): void => {
-    if (!currentGame.value) return
-    // update move positions
-    const newPositions: TilePiecePositionMap = Object.fromEntries(
-      Object.entries(move.after).filter(e => e[1] && !pieces.includes(e[1]))
-    )
-    moves[move.id].after = newPositions
-    // remove pieces from board
-    currentGame.value.positions = newPositions
-  }
-
   const endCurrentGame = (): void => {
     if (currentGame.value === null) return
     const clonedGame = cloneDeep(currentGame.value)
@@ -105,9 +94,32 @@ export const useGameStore = defineStore('gameStore', () => {
       currentGame.value.positions = move.after
       currentGame.value.moveIDs.push(move.id)
       handlePossibleTakes(move)
+      handlePossibleTransformations(move)
       pieceStore.deselectCurrentlySelectedPiece()
       changePlayer()
     }
+  }
+
+  const handlePossibleTakes = (move: Move): void => {
+    const takenPieces = detectTakenPieces(move)
+    if (takenPieces.length) handleTakenPieces(move, takenPieces)
+  }
+
+  const handlePossibleTransformations = (move: Move): void => {
+    const mode = currentGame.value?.mode
+    if (mode === GAME_MODES.CHESS) handlePossibleTransformationsForChess(move)
+    else if (mode === GAME_MODES.DRAUGHTS) handlePossibleTransformationsForDraughts()
+  }
+
+  const handleTakenPieces = (move: Move, pieces: PieceID[]): void => {
+    if (!currentGame.value) return
+    // update move positions
+    const newPositions: TilePiecePositionMap = Object.fromEntries(
+      Object.entries(move.after).filter(e => e[1] && !pieces.includes(e[1]))
+    )
+    moves[move.id].after = newPositions
+    // remove pieces from board
+    currentGame.value.positions = newPositions
   }
 
   const getInitialPositions = (

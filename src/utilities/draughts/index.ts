@@ -7,60 +7,15 @@ import { usePieceStore } from '@/stores/pieceStore'
 import { setInitialPositions } from '@/utilities/games'
 import type { Piece, PieceID } from '@/types/Piece'
 import { DRAUGHTS_PIECES } from '@/config/constants/pieces'
-import { getLocalGrids } from '@/utilities/boards'
-import {
-  getNumberOfSquaresMoved,
-  getPositionBetween,
-  getPositionsFromMove,
-} from '@/utilities/moves'
+import { getNumberOfSquaresMoved } from '@/utilities/moves'
 import { useGameStore } from '@/stores/gameStore'
-import { getTileByPosition } from './tiles'
-import { useTileStore } from '@/stores/tileStore'
-
-export const calculatePossibleDestinationTilesForMen = (piece: Piece, player: Player): TileID[] => {
-  const pieceStore = usePieceStore()
-  const destinationTiles: TileID[] = []
-  const { localPieceGrid: lpm, localTileGrid: ltm } = getLocalGrids(piece, player)
-  // if forward diagonal tiles empty and valid, enter those tiles into the array
-  if (lpm[0][0] === null && ltm[0][0] !== null) destinationTiles.push(ltm[0][0])
-  if (lpm[0][2] === null && ltm[0][2] !== null) destinationTiles.push(ltm[0][2])
-  // if opposition pieces on diagonal, search for possible take
-  const oppositionPieceIDs = pieceStore.oppositionPieceIDs
-  if (lpm[0][0] !== null) {
-    if (oppositionPieceIDs.includes(lpm[0][0])) {
-      // check if square beyond opposition piece is empty and exists
-      const { localPieceGrid: lpmTopLeft, localTileGrid: ltmTopLeft } = getLocalGrids(
-        pieceStore.pieces[lpm[0][0]],
-        player
-      )
-      if (lpmTopLeft[0][0] === null && ltmTopLeft[0][0] !== null)
-        destinationTiles.push(ltmTopLeft[0][0])
-    }
-  }
-  if (lpm[0][2] !== null) {
-    if (oppositionPieceIDs.includes(lpm[0][2])) {
-      // check if square beyond opposition piece is empty and exists
-      const { localPieceGrid: lpmTopRight, localTileGrid: ltmTopRight } = getLocalGrids(
-        pieceStore.pieces[lpm[0][2]],
-        player
-      )
-      if (lpmTopRight[0][2] === null && ltmTopRight[0][2] !== null)
-        destinationTiles.push(ltmTopRight[0][2])
-    }
-  }
-  return destinationTiles
-}
-
-export const calculatePossibleDestinationTilesForKings = (
-  piece: Piece,
-  player: Player,
-  map: PieceTilePositionMap
-): TileID[] => {
-  if (!piece || !player || !map) return []
-  // if diagonal tiles empty, enter those tiles into the array
-
-  return []
-}
+import { detectTileBetweenDiagonal } from '../tiles'
+import {
+  calculatePossibleDestinationTilesForKings,
+  shouldBecomeKing,
+  transformPieceIntoKing,
+} from '@/utilities/draughts/king'
+import { calculatePossibleDestinationTilesForMen } from '@/utilities/draughts/men'
 
 export const calculatePossibleDestinationTilesForDraughts = (
   piece: Piece,
@@ -83,14 +38,6 @@ export const detectTakenPiecesForDraughts = (move: Move): PieceID[] => {
     if (takenPiece) takenPieces.push(takenPiece)
   }
   return takenPieces
-}
-
-export const detectTileBetweenDiagonal = (move: Move): Tile | null => {
-  if (!move || !move?.before || !move?.after) return null
-  const tileStore = useTileStore()
-  const [oldPosition, newPosition] = getPositionsFromMove(move)
-  const positionBetween = getPositionBetween(oldPosition, newPosition)
-  return getTileByPosition(tileStore.activeTiles, positionBetween)
 }
 
 export const getTakenPieceIDDraughts = (move: Move): PieceID | null => {
@@ -121,4 +68,11 @@ export const getInitialPlayerPositionsForDraughts = (
 
   // return positions
   return positions
+}
+
+export const handlePossibleTransformationsForDraughts = (): void => {
+  const pieceStore = usePieceStore()
+  const selectedPiece = pieceStore.selectedPiece
+  if (!selectedPiece) return
+  if (shouldBecomeKing(selectedPiece)) transformPieceIntoKing(selectedPiece)
 }

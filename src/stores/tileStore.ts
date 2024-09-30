@@ -20,7 +20,7 @@ import { calculatePossibleDestinationTilesForChess } from '@/utilities/chess'
 import { calculatePossibleDestinationTilesForDraughts } from '@/utilities/draughts'
 import { usePlayerStore } from '@/stores/playerStore'
 import { useBoardStore } from '@/stores/boardStore'
-import { generateNewEmptyTileGrid } from '@/utilities/boards'
+import { generateNewEmptyTileGrid } from '@/utilities/tiles'
 import { falsyNotZero } from '@/utilities/booleans'
 import type { Piece, PieceID } from '@/types/Piece'
 

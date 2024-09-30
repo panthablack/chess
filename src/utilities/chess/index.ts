@@ -41,3 +41,8 @@ export const getInitialPlayerPositionsForChess = (
   // return positions
   return positions
 }
+
+export const handlePossibleTransformationsForChess = (move: Move): void => {
+  //
+  console.log(move)
+}

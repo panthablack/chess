@@ -16,6 +16,7 @@ const {
 } = CHESS_PIECES
 
 const { MAN: dMan } = DRAUGHTS_PIECES
+// const { KING: dKing } = DRAUGHTS_PIECES
 
 export const INITIAL_PIECE_POSITIONS_FOR_CHESS: Record<string, (ChessPieceType | null)[][]> = {
   PLAYER_1: [
