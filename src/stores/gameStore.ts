@@ -50,6 +50,11 @@ export const useGameStore = defineStore('gameStore', () => {
     () => currentGame.value?.positions || {}
   )
 
+  const gameHasEnded: ComputedRef<boolean> = computed(() => {
+    // TODO: implement this logic
+    return false
+  })
+
   const pieceTilePositionMap: ComputedRef<PieceTilePositionMap> = computed(() => {
     if (currentGame.value === null) return {}
     const currentPieces: Piece[] = pieceStore.currentGamePieces
@@ -96,9 +101,12 @@ export const useGameStore = defineStore('gameStore', () => {
       handlePossibleTakes(move)
       handlePossibleTransformations(move)
       pieceStore.deselectCurrentlySelectedPiece()
-      changePlayer()
+      if (gameHasEnded.value) handleGameEnd()
+      else changePlayer()
     }
   }
+
+  const handleGameEnd = (): void => alert('Game ended')
 
   const handlePossibleTakes = (move: Move): void => {
     const takenPieces = detectTakenPieces(move)
